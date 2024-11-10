@@ -7,7 +7,6 @@ import com.brix.Seller_Sync.common.utils.AppUtils;
 import com.brix.Seller_Sync.store.Store;
 import com.brix.Seller_Sync.store.StoreRepository;
 import com.brix.Seller_Sync.store.service.StoreService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
