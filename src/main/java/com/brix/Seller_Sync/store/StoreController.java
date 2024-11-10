@@ -1,5 +1,8 @@
 package com.brix.Seller_Sync.store;
 
+import com.brix.Seller_Sync.common.payload.ApiResponse;
+import com.brix.Seller_Sync.common.payload.PagedResponse;
+import com.brix.Seller_Sync.common.utils.AppConstants;
 import com.brix.Seller_Sync.store.service.StoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,15 @@ public class StoreController {
     @Autowired
     private StoreService storeService;
 
+    @GetMapping
+    public PagedResponse<Store> getAllStores(
+            @RequestParam(name = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
+            @RequestParam(name = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size
+    ){
+        return storeService.getAllStore(page,size);
+    }
+
+
     @PostMapping
     public ResponseEntity<Store> addStore(@RequestBody Store store){
         return storeService.addStore(store);
@@ -22,4 +34,18 @@ public class StoreController {
     public ResponseEntity<Store> getStore(@PathVariable(name = "id") Long id){
         return storeService.getStore(id);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Store> updateStore(
+            @PathVariable(name = "id") Long id,
+            @RequestBody Store store
+    ){
+        return storeService.updateStore(id, store);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteStore(@PathVariable(name = "id") Long id){
+        return storeService.deleteStore(id);
+    }
+
 }
