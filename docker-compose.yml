@@ -31,11 +31,11 @@ services:
 #    networks:
 #      - redis_net
 
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "9090:9090"
+#  adminer:
+#    image: adminer
+#    restart: always
+#    ports:
+#      - "9090:8080"
 
 volumes:
   cache:
