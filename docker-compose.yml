@@ -14,7 +14,7 @@ services:
     #    tmpfs:
     #      size: 134217728 # 128*2^20 bytes = 128Mb
     ports:
-      - "5433:5432" # "host:container"
+      - "5432:5432" # "host:container"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -31,11 +31,11 @@ services:
 #    networks:
 #      - redis_net
 
-#  adminer:
-#    image: adminer
-#    restart: always
-#    ports:
-#      - 8080:8080
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "9090:9090"
 
 volumes:
   cache:
