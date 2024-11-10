@@ -1,10 +1,19 @@
 package com.brix.Seller_Sync.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 @MappedSuperclass
+@Data
+@JsonIgnoreProperties(
+        value = { "createdBY", "updatedBy" },
+        allowGetters = true
+)
 public abstract class BaseEntity {
 
     @Id
@@ -27,15 +36,4 @@ public abstract class BaseEntity {
         updatedAt = LocalDateTime.now();
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
 }
