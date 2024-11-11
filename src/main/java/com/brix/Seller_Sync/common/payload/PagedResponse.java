@@ -13,19 +13,19 @@ public class PagedResponse<T> {
     private int size;
     private long totalElements;
     private int totalPages;
-    private boolean last;
+    private boolean isLast;
 
     public PagedResponse() {
 
     }
 
-    public PagedResponse(List<T> content, int page, int size, long totalElements, int totalPages, boolean last) {
+    public PagedResponse(List<T> content, int page, int size, long totalElements, int totalPages, boolean isLast) {
         setContent(content);
         this.page = page;
         this.size = size;
         this.totalElements = totalElements;
         this.totalPages = totalPages;
-        this.last = last;
+        this.isLast = isLast;
     }
 
     public List<T> getContent() {
@@ -41,6 +41,6 @@ public class PagedResponse<T> {
     }
 
     public boolean isLast() {
-        return last;
+        return isLast;
     }
 }
