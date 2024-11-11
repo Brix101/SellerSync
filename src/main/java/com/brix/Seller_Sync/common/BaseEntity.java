@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @Data
 @JsonIgnoreProperties(
-        value = { "createdBY", "updatedBy" },
+        value = { "createdAt", "updatedAt" },
         allowGetters = true
 )
 public abstract class BaseEntity {

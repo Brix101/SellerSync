@@ -54,7 +54,7 @@ public class StoreServiceImpl implements StoreService {
     public ResponseEntity<Store> updateStore(Long id, Store newStore) {
         Store store = storeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Store", "id", id));
 
-        store.setName(newStore.getName());
+//        store.setName(newStore.getName());
 
         Store updateStore = storeRepository.save(store);
 

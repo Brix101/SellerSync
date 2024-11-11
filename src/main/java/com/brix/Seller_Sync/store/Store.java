@@ -4,6 +4,7 @@ import com.brix.Seller_Sync.brand.Brand;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.BaseEntity;
 import com.brix.Seller_Sync.product.Product;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,12 +29,15 @@ public class Store extends BaseEntity {
     @Column()
     private Boolean active = true;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Client> clients = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "store",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private  List<Brand> brands = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
 }
