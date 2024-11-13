@@ -3,21 +3,41 @@ package com.brix.Seller_Sync.product;
 import com.brix.Seller_Sync.brand.Brand;
 import com.brix.Seller_Sync.common.BaseEntity;
 import com.brix.Seller_Sync.store.Store;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "product")
 public class Product extends BaseEntity {
 
+    @Column(unique = true, nullable = false)
     private String sellerSKU;
-    private String asin;
-    private String status;
 
+    @Column(unique = true, nullable = false)
+    private String asin;
+
+    @Column()
+    private String status ;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "brand_id")
     private Brand brand;
