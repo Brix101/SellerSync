@@ -42,7 +42,7 @@ public class Store extends BaseEntity {
     private List<Client> clients = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "store",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private  List<Brand> brands = new ArrayList<>();
 
     @JsonIgnore

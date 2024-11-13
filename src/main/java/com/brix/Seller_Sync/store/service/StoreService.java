@@ -2,6 +2,7 @@ package com.brix.Seller_Sync.store.service;
 
 import org.springframework.http.ResponseEntity;
 
+import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.payload.ApiResponse;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
 import com.brix.Seller_Sync.store.Store;
@@ -17,4 +18,6 @@ public interface StoreService {
     ResponseEntity<Store> updateStore(Long id, Store newStore);
 
     ResponseEntity<ApiResponse> deleteStore(Long id);
+
+    ResponseEntity<Client> addClient(Long storeId, Client client);
 }

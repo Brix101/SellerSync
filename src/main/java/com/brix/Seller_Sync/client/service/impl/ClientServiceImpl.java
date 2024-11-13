@@ -1,11 +1,8 @@
 package com.brix.Seller_Sync.client.service.impl;
 
-import com.brix.Seller_Sync.client.Client;
-import com.brix.Seller_Sync.client.ClientRepository;
-import com.brix.Seller_Sync.client.service.ClientService;
-import com.brix.Seller_Sync.common.payload.PagedResponse;
-import com.brix.Seller_Sync.common.utils.AppConstants;
-import com.brix.Seller_Sync.common.utils.AppUtils;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,14 +12,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import com.brix.Seller_Sync.client.Client;
+import com.brix.Seller_Sync.client.ClientRepository;
+import com.brix.Seller_Sync.client.service.ClientService;
+import com.brix.Seller_Sync.common.exception.ResourceNotFoundException;
+import com.brix.Seller_Sync.common.payload.PagedResponse;
+import com.brix.Seller_Sync.common.utils.AppConstants;
+import com.brix.Seller_Sync.common.utils.AppUtils;
 
 @Service
 public class ClientServiceImpl implements ClientService {
 
     @Autowired
     private ClientRepository clientRepository;
+
+
 
     @Override
     public PagedResponse<Client> getAllClientByStore(Long storeId, int page, int size) {
@@ -39,10 +43,16 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
+    public ResponseEntity<Client> getClient(Long id) {
+        Client client = clientRepository.findById(id).orElseThrow(
+            () -> new ResourceNotFoundException("Client", AppConstants.ID, id));
+
+        return new ResponseEntity<>(client, HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<Client> addClient(Client client) {
         Client newClient = clientRepository.save(client);
-
-//        newClient.setStore()
 
         return new ResponseEntity<>(newClient, HttpStatus.OK);
     }

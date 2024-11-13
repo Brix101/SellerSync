@@ -22,10 +22,12 @@ import com.brix.Seller_Sync.common.utils.AppConstants;
 import com.brix.Seller_Sync.store.service.StoreService;
 
 import jakarta.validation.Valid;
+import lombok.extern.java.Log;
 
 
 @RestController
 @RequestMapping("/api/stores")
+@Log
 public class StoreController {
     @Autowired
     private StoreService storeService;
@@ -77,10 +79,10 @@ public class StoreController {
 
     @PostMapping("/{id}/clients")
     public ResponseEntity<Client> addClient(
-            @PathVariable(name = "id") Long id,
-            @Valid @RequestBody Client client
+            @PathVariable(name = "id") Long storeId,
+            @RequestBody Client client
     ){
-        return clientService.addClient(client);
+        return storeService.addClient(storeId, client);
     }
 
 }

@@ -12,9 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.brix.Seller_Sync.client.Client;
+import com.brix.Seller_Sync.client.service.ClientService;
 import com.brix.Seller_Sync.common.exception.ResourceNotFoundException;
 import com.brix.Seller_Sync.common.payload.ApiResponse;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
+import com.brix.Seller_Sync.common.utils.AppConstants;
 import com.brix.Seller_Sync.common.utils.AppUtils;
 import com.brix.Seller_Sync.store.Store;
 import com.brix.Seller_Sync.store.StoreRepository;
@@ -25,6 +28,9 @@ public class StoreServiceImpl implements StoreService {
 
     @Autowired
     private StoreRepository storeRepository;
+
+    @Autowired 
+    private ClientService  clientService;
 
     @Override
     public PagedResponse<Store> getAllStore(int page, int size) {
@@ -41,7 +47,8 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public ResponseEntity<Store> getStore(Long id) {
-        Store store = storeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Store", "id", id));
+        Store store = storeRepository.findById(id).orElseThrow(
+            () -> new ResourceNotFoundException("Store", AppConstants.ID, id));
         return new ResponseEntity<>(store, HttpStatus.OK);
     }
 
@@ -53,7 +60,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public ResponseEntity<Store> updateStore(Long id, Store newStore) {
-        Store store = storeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Store", "id", id));
+        Store store = storeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Store", AppConstants.ID, id));
 
        store.setName(newStore.getName());
 
@@ -64,12 +71,23 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public ResponseEntity<ApiResponse> deleteStore(Long id){
-        Store store = storeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Store", "id", id));
+        Store store = storeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Store", AppConstants.ID, id));
 
         storeRepository.delete(store);
 
         return new ResponseEntity<>(new ApiResponse(Boolean.TRUE, "You successfully deleted store"), HttpStatus.OK);
 
+    }
+
+    @Override
+    public ResponseEntity<Client> addClient(Long storeId, Client client) {
+        Store store = storeRepository.findById(storeId).orElseThrow(() -> new ResourceNotFoundException("Store", AppConstants.ID, storeId));
+
+        client.setStore(store);
+
+        Client newClient = clientService.addClient(client).getBody();
+
+        return new ResponseEntity<>(newClient, HttpStatus.OK);
     }
 
 }

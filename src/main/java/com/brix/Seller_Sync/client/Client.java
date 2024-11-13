@@ -3,27 +3,46 @@ package com.brix.Seller_Sync.client;
 import com.brix.Seller_Sync.common.BaseEntity;
 import com.brix.Seller_Sync.store.Store;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+@EqualsAndHashCode(callSuper = true)
 @Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = "clientId")})
 public class Client extends BaseEntity {
 
-    @Column(nullable = false)
+    @NotNull
+    @Column(nullable = false, unique = true)
     private String clientId;
 
+    @NotNull
     @Column(nullable = false)
     private String clientSecret;
 
-    @Column(nullable = false)
+    @NotNull
+    @Column(nullable = false, length = 1024)
     private String refreshToken;
 
+    @NotNull
     @Column(nullable = false)
     private String grantType;
 
-    @Enumerated(EnumType.STRING)
+    @NotNull
     @Column(nullable = false)
-    private ProviderType providerType;
+    private String provider;
 
     @JsonIgnore
     @ManyToOne

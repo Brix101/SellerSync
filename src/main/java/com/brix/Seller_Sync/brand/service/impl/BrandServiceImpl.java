@@ -18,6 +18,7 @@ import com.brix.Seller_Sync.brand.service.BrandService;
 import com.brix.Seller_Sync.common.exception.ResourceNotFoundException;
 import com.brix.Seller_Sync.common.payload.ApiResponse;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
+import com.brix.Seller_Sync.common.utils.AppConstants;
 import com.brix.Seller_Sync.common.utils.AppUtils;
 
 @Service
@@ -41,7 +42,7 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public ResponseEntity<Brand> getBrand(Long id) {
-        Brand brand = brandRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Brand", "id", id));
+        Brand brand = brandRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Brand", AppConstants.ID, id));
         return new ResponseEntity<>(brand, HttpStatus.OK);
     }
 
@@ -53,7 +54,7 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public ResponseEntity<Brand> updateBrand(Long id, Brand newBrand) {
-        Brand brand = brandRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Brand", "id", id));
+        Brand brand = brandRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Brand", AppConstants.ID, id));
 
         brand.setName(newBrand.getName());
 
@@ -64,7 +65,7 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public ResponseEntity<ApiResponse> deleteBrand(Long id) {
-        Brand brand = brandRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Brand", "id", id));
+        Brand brand = brandRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Brand", AppConstants.ID, id));
         brandRepository.delete(brand);
 
         return new ResponseEntity<>(new ApiResponse(true, "Brand deleted successfully"), HttpStatus.OK);
