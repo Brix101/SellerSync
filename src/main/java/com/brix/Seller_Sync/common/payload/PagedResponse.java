@@ -1,10 +1,10 @@
 package com.brix.Seller_Sync.common.payload;
 
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class PagedResponse<T> {

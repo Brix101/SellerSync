@@ -1,7 +1,6 @@
 package com.brix.Seller_Sync.common.utils;
 
 import com.brix.Seller_Sync.common.exception.BadRequestException;
-import org.springframework.http.HttpStatus;
 
 public class AppUtils {
     public static void validatePageNumberAndSize(int page, int size) {

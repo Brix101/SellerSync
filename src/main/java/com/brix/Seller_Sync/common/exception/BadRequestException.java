@@ -1,8 +1,9 @@
 package com.brix.Seller_Sync.common.exception;
 
-import com.brix.Seller_Sync.common.payload.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import com.brix.Seller_Sync.common.payload.ApiResponse;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class BadRequestException extends RuntimeException {
