@@ -78,7 +78,7 @@ public class StoreController {
     @PostMapping("/{id}/clients")
     public ResponseEntity<Client> addClient(
             @PathVariable(name = "id") Long id,
-            @RequestBody Client client
+            @Valid @RequestBody Client client
     ){
         return clientService.addClient(client);
     }
