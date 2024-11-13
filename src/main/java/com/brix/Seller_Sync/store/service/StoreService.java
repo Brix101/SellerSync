@@ -1,9 +1,10 @@
 package com.brix.Seller_Sync.store.service;
 
+import org.springframework.http.ResponseEntity;
+
 import com.brix.Seller_Sync.common.payload.ApiResponse;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
 import com.brix.Seller_Sync.store.Store;
-import org.springframework.http.ResponseEntity;
 
 public interface StoreService {
 
