@@ -1,5 +1,6 @@
 package com.brix.Seller_Sync.store;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,8 @@ import com.brix.Seller_Sync.common.payload.PagedResponse;
 import com.brix.Seller_Sync.common.utils.AppConstants;
 import com.brix.Seller_Sync.store.service.StoreService;
 
-//import javax.validation.Valid;
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/api/stores")
@@ -39,9 +41,8 @@ public class StoreController {
         return storeService.getAllStore(page,size);
     }
 
-
     @PostMapping
-    public ResponseEntity<Store> addStore(@RequestBody Store store){
+    public ResponseEntity<Store> addStore(@Valid @RequestBody Store store){
         return storeService.addStore(store);
     }
 
@@ -53,7 +54,7 @@ public class StoreController {
     @PutMapping("/{id}")
     public ResponseEntity<Store> updateStore(
             @PathVariable(name = "id") Long id,
-            @RequestBody Store store
+            @Valid @RequestBody Store store
     ){
         return storeService.updateStore(id, store);
     }

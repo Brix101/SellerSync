@@ -15,6 +15,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,6 +30,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "store")
 public class Store extends BaseEntity {
 
+    @NotEmpty()
     @Column()
     private String name;
 
