@@ -48,4 +48,5 @@ public class Client extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
+
 }
