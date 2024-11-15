@@ -1,5 +1,7 @@
 package com.brix.Seller_Sync.store.service;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 
 import com.brix.Seller_Sync.client.Client;
@@ -20,4 +22,6 @@ public interface StoreService {
     ResponseEntity<ApiResponse> deleteStore(Long id);
 
     ResponseEntity<Client> addClient(Long storeId, Client client);
+
+    List<Store> getAllStoresToken();
 }

@@ -38,7 +38,7 @@ public class ClientServiceImpl implements ClientService {
 
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, AppConstants.CREATED_AT);
 
-        Page<Client> clients = clientRepository.findByStoreId(storeId, pageable);
+        Page<Client> clients = clientRepository.findPageByStoreId(storeId, pageable);
 
         List<Client> content = clients.getNumberOfElements() == 0 ? Collections.emptyList() : clients.getContent();
 
@@ -52,16 +52,28 @@ public class ClientServiceImpl implements ClientService {
 
         for (Client client : clients) {
             if (client.isTokenExpired()) {
-                TokenResponse tokenResponse = amzAuthService.getAccessToken(client);
+                Client refreshedClient = refreshAccessToken(client.getId());
 
-                client.setAccessToken(tokenResponse.getAccessToken());
-                client.setTokenType(tokenResponse.getTokenType());
-                client.setExpiresAtFromExpiresIn(tokenResponse.getExpiresIn());
-                clientRepository.save(client);
+                client.setAccessToken(refreshedClient.getAccessToken());
             }
         }
         return clients;
     }
+
+    @Override
+    public List<Client> getAllClientsTokenByStoreID(Long storeId) {
+        List<Client> clients = clientRepository.findAllByStoreId(storeId);
+
+        for (Client client : clients) {
+            if (client.isTokenExpired()) {
+                Client refreshedClient = refreshAccessToken(client.getId());
+
+                client.setAccessToken(refreshedClient.getAccessToken());
+            }
+        }
+        return clients;
+    }
+
 
     @Override
     public ResponseEntity<Client> getClient(Long id) {
@@ -102,6 +114,21 @@ public class ClientServiceImpl implements ClientService {
         clientRepository.delete(client);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public Client refreshAccessToken(Long id) {
+        Client client = clientRepository.findById(id).orElseThrow(
+            () -> new ResourceNotFoundException("Client", AppConstants.ID, id));
+
+        TokenResponse tokenResponse = amzAuthService.getAccessToken(client);
+
+        client.setAccessToken(tokenResponse.getAccessToken());
+        client.setTokenType(tokenResponse.getTokenType());
+        client.setExpiresAtFromExpiresIn(tokenResponse.getExpiresIn());
+        clientRepository.save(client);
+
+        return client;
     }
 
 }

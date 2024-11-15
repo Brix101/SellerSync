@@ -48,12 +48,15 @@ public class Client extends BaseEntity {
     @Column(nullable = false, length = 1024, columnDefinition = "TEXT")
     private String refreshToken;
 
+    @JsonIgnore
     @Column(length = 1024, columnDefinition = "TEXT")
     private String accessToken;
 
+    @JsonIgnore
     @Column()
     private String tokenType;
 
+    @JsonIgnore
     @Column()
     private LocalDateTime expiresAt;
 
@@ -67,6 +70,7 @@ public class Client extends BaseEntity {
         this.expiresAt = LocalDateTime.now().plus(expiresIn, ChronoUnit.SECONDS);
     }
 
+    @JsonIgnore
     public boolean isTokenExpired() {
         LocalDateTime localDateTime = LocalDateTime.now();
 

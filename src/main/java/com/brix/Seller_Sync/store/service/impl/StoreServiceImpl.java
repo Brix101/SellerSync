@@ -90,4 +90,16 @@ public class StoreServiceImpl implements StoreService {
         return new ResponseEntity<>(newClient, HttpStatus.OK);
     }
 
+    @Override
+    public List<Store> getAllStoresToken() {
+        List<Store> stores = storeRepository.findAll();
+
+        for (Store store : stores) {
+            List<Client> clients = clientService.getAllClientsTokenByStoreID(store.getId());
+
+            store.setClients(clients);
+        }
+
+        return stores;
+    }
 }

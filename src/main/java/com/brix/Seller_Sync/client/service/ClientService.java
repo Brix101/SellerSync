@@ -13,6 +13,8 @@ public interface ClientService {
 
     List<Client> getAllClientsToken(); 
 
+    List<Client> getAllClientsTokenByStoreID(Long storeId);
+
     ResponseEntity<Client> getClient(Long id);
 
     ResponseEntity<Client> addClient(Client client);
@@ -20,4 +22,6 @@ public interface ClientService {
     ResponseEntity<Client> updateClient(Long id, Client client);
 
     ResponseEntity<Client> deleteClient(Long id);
+
+    Client refreshAccessToken(Long id);
 }
