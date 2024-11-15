@@ -1,5 +1,8 @@
 package com.brix.Seller_Sync.client;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 import com.brix.Seller_Sync.common.BaseEntity;
 import com.brix.Seller_Sync.store.Store;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,7 +25,7 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = "clientId")})
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = "clientId") })
 public class Client extends BaseEntity {
 
     @NotNull
@@ -34,21 +37,40 @@ public class Client extends BaseEntity {
     private String clientSecret;
 
     @NotNull
-    @Column(nullable = false, length = 1024)
-    private String refreshToken;
+    @Column(nullable = false)
+    private String provider;
 
     @NotNull
     @Column(nullable = false)
     private String grantType;
-
+    
     @NotNull
-    @Column(nullable = false)
-    private String provider;
+    @Column(nullable = false, length = 1024, columnDefinition = "TEXT")
+    private String refreshToken;
+
+    @Column(length = 1024, columnDefinition = "TEXT")
+    private String accessToken;
+
+    @Column()
+    private String tokenType;
+
+    @Column()
+    private LocalDateTime expiresAt;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
     @ToString.Exclude
     private Store store;
+
+    public void setExpiresAtFromExpiresIn(long expiresIn) {
+        this.expiresAt = LocalDateTime.now().plus(expiresIn, ChronoUnit.SECONDS);
+    }
+
+    public boolean isTokenExpired() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+
+        return expiresAt == null || expiresAt.isBefore(localDateTime) || expiresAt.isEqual(localDateTime);
+    }
 
 }

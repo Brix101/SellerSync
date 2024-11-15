@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.brix.Seller_Sync.amazon.payload.TokenResponse;
+import com.brix.Seller_Sync.amazon.service.AmzAuthService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.ClientRepository;
 import com.brix.Seller_Sync.client.service.ClientService;
@@ -25,6 +27,8 @@ public class ClientServiceImpl implements ClientService {
 
     @Autowired
     private ClientRepository clientRepository;
+
+    @Autowired AmzAuthService amzAuthService;
 
 
 
@@ -43,8 +47,20 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public List<Client> getAllClient() {
-        return clientRepository.findAll();
+    public List<Client> getAllClientsToken() {
+        List<Client> clients = clientRepository.findAll();
+
+        for (Client client : clients) {
+            if (client.isTokenExpired()) {
+                TokenResponse tokenResponse = amzAuthService.getAccessToken(client);
+
+                client.setAccessToken(tokenResponse.getAccessToken());
+                client.setTokenType(tokenResponse.getTokenType());
+                client.setExpiresAtFromExpiresIn(tokenResponse.getExpiresIn());
+                clientRepository.save(client);
+            }
+        }
+        return clients;
     }
 
     @Override
@@ -61,4 +77,31 @@ public class ClientServiceImpl implements ClientService {
 
         return new ResponseEntity<>(newClient, HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<Client> updateClient(Long id, Client client) {
+        Client existingClient = clientRepository.findById(id).orElseThrow(
+            () -> new ResourceNotFoundException("Client", AppConstants.ID, id));
+
+        existingClient.setClientId(client.getClientId());
+        existingClient.setClientSecret(client.getClientSecret());
+        existingClient.setProvider(client.getProvider());
+        existingClient.setGrantType(client.getGrantType());
+        existingClient.setRefreshToken(client.getRefreshToken());
+
+        Client updatedClient = clientRepository.save(existingClient);
+
+        return new ResponseEntity<>(updatedClient, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Client> deleteClient(Long id) {
+        Client client = clientRepository.findById(id).orElseThrow(
+            () -> new ResourceNotFoundException("Client", AppConstants.ID, id));
+
+        clientRepository.delete(client);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

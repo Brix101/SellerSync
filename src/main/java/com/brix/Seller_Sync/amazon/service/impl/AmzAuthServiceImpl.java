@@ -11,14 +11,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.brix.Seller_Sync.amazon.payload.TokenResponse;
-import com.brix.Seller_Sync.amazon.service.AuthService;
+import com.brix.Seller_Sync.amazon.service.AmzAuthService;
 import com.brix.Seller_Sync.client.Client;
 
 import lombok.extern.java.Log;
 
 @Service
 @Log
-public class AuthServiceImpl implements AuthService {
+public class AmzAuthServiceImpl implements AmzAuthService {
 
     @Override
     public TokenResponse getAccessToken(Client client) {

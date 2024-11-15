@@ -11,9 +11,13 @@ public interface ClientService {
 
     PagedResponse<Client> getAllClientByStore(Long storeId, int page, int size);
 
-    List<Client> getAllClient(); 
+    List<Client> getAllClientsToken(); 
 
     ResponseEntity<Client> getClient(Long id);
 
     ResponseEntity<Client> addClient(Client client);
+
+    ResponseEntity<Client> updateClient(Long id, Client client);
+
+    ResponseEntity<Client> deleteClient(Long id);
 }
