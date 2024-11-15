@@ -21,15 +21,15 @@ import lombok.extern.java.Log;
 public class AuthServiceImpl implements AuthService {
 
     @Override
-    public TokenResponse refreshAcessToken(Client client) {
+    public TokenResponse getAccessToken(Client client) {
         String url = "https://api.amazon.com/auth/o2/token";
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        headers.set("Content-Type", "application/json");
 
         Map<String, String> body = new HashMap<>();
-        body.put("grant_type", "refresh_token");
+        body.put("grant_type", client.getGrantType());
         body.put("client_id", client.getClientId());
         body.put("client_secret", client.getClientSecret());
         body.put("refresh_token", client.getRefreshToken());
@@ -43,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
             return response.getBody();
         } catch (Exception e) {
             log.info("Error getting access token" + e.getMessage());
-            throw new RuntimeException("Error getting access token", e);
+            throw new RuntimeException("Error getting access token ", e);
         }
     }
 }

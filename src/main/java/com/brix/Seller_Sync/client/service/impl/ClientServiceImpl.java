@@ -43,6 +43,11 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
+    public List<Client> getAllClient() {
+        return clientRepository.findAll();
+    }
+
+    @Override
     public ResponseEntity<Client> getClient(Long id) {
         Client client = clientRepository.findById(id).orElseThrow(
             () -> new ResourceNotFoundException("Client", AppConstants.ID, id));

@@ -5,6 +5,6 @@ import com.brix.Seller_Sync.client.Client;
 
 public interface AuthService {
 
-    TokenResponse refreshAcessToken(Client client);
+    TokenResponse getAccessToken(Client client);
 
 }

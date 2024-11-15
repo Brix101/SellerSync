@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -47,6 +48,7 @@ public class Client extends BaseEntity {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
+    @ToString.Exclude
     private Store store;
 
 }
