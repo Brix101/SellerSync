@@ -17,11 +17,12 @@ public class ClientScheduledTasks {
     @Autowired
     private ClientService clientService;
 
-    @Scheduled(cron = "0 */30 * * * ?") // This cron expression means every 30 minutes
+    // @Scheduled(cron = "0 */30 * * * ?") // This cron expression means every 30 minutes
+    @Scheduled(cron = "*/30 * * * * ?") // This cron expression means every 30 seconds
     public void performTask() {
 
         log.info("Client cron task executed every 30 seconds");
-       List<Client> clients = clientService.getAllClientsToken();
+        List<Client> clients = clientService.getAllClientsToken();
 
         for (Client client : clients) {
             log.info(client.toString());

@@ -12,8 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.brix.Seller_Sync.amazon.exception.LWAException;
 import com.brix.Seller_Sync.amazon.payload.TokenResponse;
-import com.brix.Seller_Sync.amazon.service.AmzAuthService;
+import com.brix.Seller_Sync.amazon.service.AmznAuthService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.ClientRepository;
 import com.brix.Seller_Sync.client.service.ClientService;
@@ -22,13 +23,16 @@ import com.brix.Seller_Sync.common.payload.PagedResponse;
 import com.brix.Seller_Sync.common.utils.AppConstants;
 import com.brix.Seller_Sync.common.utils.AppUtils;
 
+import lombok.extern.java.Log;
+
 @Service
+@Log
 public class ClientServiceImpl implements ClientService {
 
     @Autowired
     private ClientRepository clientRepository;
 
-    @Autowired AmzAuthService amzAuthService;
+    @Autowired AmznAuthService amznAuthService;
 
 
 
@@ -52,9 +56,13 @@ public class ClientServiceImpl implements ClientService {
 
         for (Client client : clients) {
             if (client.isTokenExpired()) {
-                Client refreshedClient = refreshAccessToken(client.getId());
-
-                client.setAccessToken(refreshedClient.getAccessToken());
+                try {
+                    Client refreshedClient = refreshAccessToken(client.getId());
+                    client.setAccessToken(refreshedClient.getAccessToken());
+                } catch (LWAException e) {
+                    // clients.remove(client);
+                    continue; // Skip the client that has an error
+                }
             }
         }
         return clients;
@@ -66,9 +74,13 @@ public class ClientServiceImpl implements ClientService {
 
         for (Client client : clients) {
             if (client.isTokenExpired()) {
-                Client refreshedClient = refreshAccessToken(client.getId());
-
-                client.setAccessToken(refreshedClient.getAccessToken());
+                try {
+                    Client refreshedClient = refreshAccessToken(client.getId());
+                    client.setAccessToken(refreshedClient.getAccessToken());
+                } catch (LWAException e) {
+                    clients.remove(client);
+                    continue; // Skip the client that has an error
+                }
             }
         }
         return clients;
@@ -117,15 +129,27 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public Client refreshAccessToken(Long id) {
+    public Client refreshAccessToken(Long id) throws LWAException {
         Client client = clientRepository.findById(id).orElseThrow(
             () -> new ResourceNotFoundException("Client", AppConstants.ID, id));
 
-        TokenResponse tokenResponse = amzAuthService.getAccessToken(client);
+        try {
+            TokenResponse tokenResponse = amznAuthService.getAccessToken(client);
 
-        client.setAccessToken(tokenResponse.getAccessToken());
-        client.setTokenType(tokenResponse.getTokenType());
-        client.setExpiresAtFromExpiresIn(tokenResponse.getExpiresIn());
+            client.setAccessToken(tokenResponse.getAccessToken());
+            client.setTokenType(tokenResponse.getTokenType());
+            client.setExpiresAtFromExpiresIn(tokenResponse.getExpiresIn());
+            client.setError(null);
+            client.setErrorDescription(null);
+
+        } catch (LWAException e) {
+            client.setAccessToken(null);
+            client.setTokenType(null);
+            client.setExpiresAt(null);
+            client.setError(e.getErrorCode());
+            client.setErrorDescription(e.getErrorMessage());
+        }
+
         clientRepository.save(client);
 
         return client;

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 
+import com.brix.Seller_Sync.amazon.exception.LWAException;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
 
@@ -23,5 +24,5 @@ public interface ClientService {
 
     ResponseEntity<Client> deleteClient(Long id);
 
-    Client refreshAccessToken(Long id);
+    Client refreshAccessToken(Long id) throws LWAException;
 }

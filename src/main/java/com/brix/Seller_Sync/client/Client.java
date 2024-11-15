@@ -61,6 +61,14 @@ public class Client extends BaseEntity {
     private LocalDateTime expiresAt;
 
     @JsonIgnore
+    @Column()
+    private String error;
+
+    @JsonIgnore
+    @Column(length = 1024, columnDefinition = "TEXT")
+    private String errorDescription;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
     @ToString.Exclude
