@@ -57,8 +57,7 @@ public class ClientServiceImpl implements ClientService {
         for (Client client : clients) {
             if (client.isTokenExpired()) {
                 try {
-                    Client refreshedClient = refreshAccessToken(client.getId());
-                    client.setAccessToken(refreshedClient.getAccessToken());
+                    client = refreshAccessToken(client.getId());
                 } catch (LWAException e) {
                     // clients.remove(client);
                     continue; // Skip the client that has an error
@@ -75,8 +74,7 @@ public class ClientServiceImpl implements ClientService {
         for (Client client : clients) {
             if (client.isTokenExpired()) {
                 try {
-                    Client refreshedClient = refreshAccessToken(client.getId());
-                    client.setAccessToken(refreshedClient.getAccessToken());
+                    client = refreshAccessToken(client.getId());
                 } catch (LWAException e) {
                     clients.remove(client);
                     continue; // Skip the client that has an error
