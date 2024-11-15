@@ -3,7 +3,7 @@ package com.brix.Seller_Sync.brand;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.brix.Seller_Sync.common.BaseEntity;
+import com.brix.Seller_Sync.common.entity.BaseEntity;
 import com.brix.Seller_Sync.product.Product;
 import com.brix.Seller_Sync.store.Store;
 import com.fasterxml.jackson.annotation.JsonIgnore;

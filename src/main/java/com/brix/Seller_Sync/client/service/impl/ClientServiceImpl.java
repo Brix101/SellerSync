@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.brix.Seller_Sync.amazon.exception.LWAException;
-import com.brix.Seller_Sync.amazon.payload.TokenResponse;
+import com.brix.Seller_Sync.amazon.payload.AuthResponse;
 import com.brix.Seller_Sync.amazon.service.AmznAuthService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.ClientRepository;
@@ -132,7 +132,7 @@ public class ClientServiceImpl implements ClientService {
             () -> new ResourceNotFoundException("Client", AppConstants.ID, id));
 
         try {
-            TokenResponse tokenResponse = amznAuthService.getAccessToken(client);
+            AuthResponse tokenResponse = amznAuthService.getAccessToken(client);
 
             client.setAccessToken(tokenResponse.getAccessToken());
             client.setTokenType(tokenResponse.getTokenType());

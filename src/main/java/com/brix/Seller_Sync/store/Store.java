@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.brix.Seller_Sync.brand.Brand;
 import com.brix.Seller_Sync.client.Client;
-import com.brix.Seller_Sync.common.BaseEntity;
+import com.brix.Seller_Sync.common.entity.BaseEntity;
 import com.brix.Seller_Sync.product.Product;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

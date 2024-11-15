@@ -1,11 +1,18 @@
-package com.brix.Seller_Sync.common;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
+package com.brix.Seller_Sync.common.entity;
 
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import lombok.Data;
+import lombok.Getter;
 
 @Getter
 @MappedSuperclass
