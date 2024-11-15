@@ -3,7 +3,7 @@ package com.brix.Seller_Sync.client;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import com.brix.Seller_Sync.amazon.payload.AuthRequest;
+import com.brix.Seller_Sync.amazon.payload.LWARequest;
 import com.brix.Seller_Sync.common.entity.BaseEntity;
 import com.brix.Seller_Sync.store.Store;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -87,7 +87,7 @@ public class Client extends BaseEntity {
     }
 
     @JsonIgnore
-    public AuthRequest toAuthRequest() {
-        return new AuthRequest(grantType, clientId, clientSecret, refreshToken);
+    public LWARequest toAuthRequest() {
+        return new LWARequest(grantType, clientId, clientSecret, refreshToken);
     }
 }
