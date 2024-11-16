@@ -16,9 +16,9 @@ public class ProductScheduledTasks {
         log.info("Product cron task executed");
     }
 
-    @Scheduled(cron = "*/30 * * * * ?") // This cron expression means every 30 seconds
+    @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every 30 seconds
     public void performTask() {
         // Your task logic here
-        log.info("Product cron task executed every 30 seconds");
+        // log.info("Product cron task executed every 30 seconds");
     }
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MarketplaceEntry {
     private String marketplaceId;
-    private String country;
     private String countryCode;
+    private String country;
     private String region;
 }

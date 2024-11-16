@@ -25,7 +25,7 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
     public CreateReportResponse createReport(Client client, CreateReportSpecification createReportSpecification) {
         // TODO add a key value pair to hold if there is existing report that is not yet completed
 
-        String url = AmznConstants.API_URL + "/reports/2021-06-30/reports";
+        String url = AmznConstants.SP_API_URL + "/reports/2021-06-30/reports";
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -46,7 +46,7 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
     @Override
     public Report getReport(Client client, String reportId) {
-        String url = AmznConstants.API_URL + "/reports/2021-06-30/reports/" + reportId;
+        String url = AmznConstants.SP_API_URL + "/reports/2021-06-30/reports/" + reportId;
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -67,7 +67,7 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
     @Override
     public ReportDocument getReportDocument(Client client, String reportDocumentId) {
-        String url = AmznConstants.API_URL + "/reports/2021-06-30/documents/" + reportDocumentId;
+        String url = AmznConstants.SP_API_URL + "/reports/2021-06-30/documents/" + reportDocumentId;
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();

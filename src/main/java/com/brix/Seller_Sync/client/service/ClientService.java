@@ -12,7 +12,7 @@ public interface ClientService {
 
     PagedResponse<Client> getAllClientByStore(Long storeId, int page, int size);
 
-    List<Client> getAllClientsToken(); 
+    List<Client> getAllSPClientsToken(); 
 
     List<Client> getAllClientsTokenByStoreID(Long storeId);
 

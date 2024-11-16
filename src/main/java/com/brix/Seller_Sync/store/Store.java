@@ -39,7 +39,7 @@ public class Store extends BaseEntity {
     private Boolean active = true;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Client> clients = new ArrayList<>();
 
     @JsonIgnore
@@ -51,6 +51,6 @@ public class Store extends BaseEntity {
     private List<Product> products = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Marketplace> marketplaces = new ArrayList<>();
 }

@@ -51,8 +51,8 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public List<Client> getAllClientsToken() {
-        List<Client> clients = clientRepository.findAll();
+    public List<Client> getAllSPClientsToken() {
+        List<Client> clients = clientRepository.findAllByProvider("SP");
 
         for (Client client : clients) {
             if (client.isTokenExpired()) {

@@ -11,4 +11,6 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     Page<Client> findPageByStoreId(Long storeId, Pageable pageable);
 
     List<Client> findAllByStoreId(Long storeId);
+
+    List<Client> findAllByProvider(String provider);
 }

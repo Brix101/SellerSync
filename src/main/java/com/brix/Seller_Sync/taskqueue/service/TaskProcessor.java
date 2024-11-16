@@ -18,7 +18,8 @@ public class TaskProcessor {
     @Autowired
     private TaskQueueService taskQueueService;
 
-    @Scheduled(fixedRate = 5000)
+    // @Scheduled(fixedRate = 5000)
+    @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
     public void processTask() {
         log.info("Processing task");
         String taskId = taskQueueService.getTask();
