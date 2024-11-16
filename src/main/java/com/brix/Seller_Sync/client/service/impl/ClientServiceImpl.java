@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.brix.Seller_Sync.amazon.exception.LWAException;
 import com.brix.Seller_Sync.amazon.payload.LWAResponse;
-import com.brix.Seller_Sync.amazon.service.LWAService;
+import com.brix.Seller_Sync.amazon.service.AmznLWAService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.ClientRepository;
 import com.brix.Seller_Sync.client.service.ClientService;
@@ -33,7 +33,7 @@ public class ClientServiceImpl implements ClientService {
     private ClientRepository clientRepository;
 
     @Autowired 
-    private LWAService lwaService;
+    private AmznLWAService lwaService;
 
 
     @Override

@@ -6,7 +6,7 @@ import com.brix.Seller_Sync.amazon.payload.marketplace.AmznMarketplace;
 import com.brix.Seller_Sync.amazon.payload.marketplace.MarketplaceEntry;
 import com.brix.Seller_Sync.client.Client;
 
-public interface MarketplaceService {
+public interface AmznMarketplaceService {
 
     List<AmznMarketplace> getMarketplaceParticipations(Client client);
 

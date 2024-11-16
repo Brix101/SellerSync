@@ -11,14 +11,14 @@ import org.springframework.web.client.RestTemplate;
 import com.brix.Seller_Sync.amazon.exception.LWAException;
 import com.brix.Seller_Sync.amazon.payload.LWARequest;
 import com.brix.Seller_Sync.amazon.payload.LWAResponse;
-import com.brix.Seller_Sync.amazon.service.LWAService;
+import com.brix.Seller_Sync.amazon.service.AmznLWAService;
 import com.brix.Seller_Sync.client.Client;
 
 import lombok.extern.java.Log;
 
 @Service
 @Log
-public class LWAServiceImpl implements LWAService {
+public class AmznLWAServiceImpl implements AmznLWAService {
 
     @Override
     public LWAResponse getAccessToken(Client client) throws LWAException {

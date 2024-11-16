@@ -14,11 +14,11 @@ import com.brix.Seller_Sync.amazon.AmznConstants;
 import com.brix.Seller_Sync.amazon.payload.marketplace.AmznMarketplace;
 import com.brix.Seller_Sync.amazon.payload.marketplace.GetMarketplaceParticipationsResponse;
 import com.brix.Seller_Sync.amazon.payload.marketplace.MarketplaceEntry;
-import com.brix.Seller_Sync.amazon.service.MarketplaceService;
+import com.brix.Seller_Sync.amazon.service.AmznMarketplaceService;
 import com.brix.Seller_Sync.client.Client;
 
 @Service
-public class MarketplaceServiceImpl implements MarketplaceService {
+public class AmznMarketplaceServiceImpl implements AmznMarketplaceService {
 
     @Override
     public List<AmznMarketplace> getMarketplaceParticipations(Client client) {
