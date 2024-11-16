@@ -6,7 +6,7 @@ import com.brix.Seller_Sync.amazon.payload.Report;
 import com.brix.Seller_Sync.amazon.payload.ReportDocument;
 import com.brix.Seller_Sync.client.Client;
 
-public interface SPReport {
+public interface SPReportService {
 
     CreateReportResponse createReport(Client client, CreateReportSpecification createReportSpecification);
 

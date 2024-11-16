@@ -12,14 +12,14 @@ import com.brix.Seller_Sync.amazon.payload.CreateReportResponse;
 import com.brix.Seller_Sync.amazon.payload.CreateReportSpecification;
 import com.brix.Seller_Sync.amazon.payload.Report;
 import com.brix.Seller_Sync.amazon.payload.ReportDocument;
-import com.brix.Seller_Sync.amazon.service.SPReport;
+import com.brix.Seller_Sync.amazon.service.SPReportService;
 import com.brix.Seller_Sync.client.Client;
 
 import lombok.extern.java.Log;
 
 @Service
 @Log
-public class SPReportImpl implements SPReport {
+public class SPReportServiceImpl implements SPReportService {
 
     @Override
     public CreateReportResponse createReport(Client client, CreateReportSpecification createReportSpecification) {
