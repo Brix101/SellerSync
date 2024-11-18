@@ -31,7 +31,7 @@ public class MarketplaceScheduledTasks {
 
     @Scheduled(cron = "0 0 0 * * ?") 
     public void performMarkerplaceUpdateCron(){
-        log.info("Marketplace cron task executed");
+        log.info("Starting marketplace update cron job");
 
         List<Client> clients = clientService.getAllSPClientsToken();
 
@@ -40,7 +40,7 @@ public class MarketplaceScheduledTasks {
             List<Marketplace> storeMarketplaces = client.getStore().getMarketplaces();
 
             List<String> storeMarketplaceIds = storeMarketplaces.stream().map(Marketplace::getMarketplaceId).collect(Collectors.toList());
-
+            
             for (AmznMarketplace amznMarketplace : marketplaces){
                 if (!storeMarketplaceIds.contains(amznMarketplace.getId())){
                     Marketplace marketplace = amznMarketplace.toMarketplace();
@@ -51,5 +51,7 @@ public class MarketplaceScheduledTasks {
                 }
             }
         }
+
+        log.info("Marketplace update cron job completed");
     }
 }

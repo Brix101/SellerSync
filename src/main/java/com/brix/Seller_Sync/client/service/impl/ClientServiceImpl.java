@@ -54,13 +54,15 @@ public class ClientServiceImpl implements ClientService {
     public List<Client> getAllSPClientsToken() {
         List<Client> clients = clientRepository.findAllByProvider("SP");
 
-        for (Client client : clients) {
+        for (int i = 0; i < clients.size(); i++) {
+            Client client = clients.get(i);
             if (client.isTokenExpired()) {
                 try {
                     client = refreshAccessToken(client.getId());
+                    clients.set(i, client); // Replace the client in the list
                 } catch (LWAException e) {
-                    // clients.remove(client);
-                    continue; // Skip the client that has an error
+                    clients.remove(i); // Remove the client that has an error
+                    i--; // Adjust the index after removal
                 }
             }
         }
