@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import com.brix.Seller_Sync.common.entity.BaseEntity;
-import com.brix.Seller_Sync.lwa.payload.LWARequest;
+import com.brix.Seller_Sync.lwa.payload.LWAAccessTokenRequestMeta;
 import com.brix.Seller_Sync.store.Store;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -87,7 +87,7 @@ public class Client extends BaseEntity {
     }
 
     @JsonIgnore
-    public LWARequest toAuthRequest() {
-        return new LWARequest(grantType, clientId, clientSecret, refreshToken);
+    public LWAAccessTokenRequestMeta toAuthRequest() {
+        return new LWAAccessTokenRequestMeta(grantType, clientId, clientSecret, refreshToken);
     }
 }

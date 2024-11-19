@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LWARequest {
+public class LWAAccessTokenRequestMeta {
 
     @JsonProperty("grant_type")
     private String grantType;

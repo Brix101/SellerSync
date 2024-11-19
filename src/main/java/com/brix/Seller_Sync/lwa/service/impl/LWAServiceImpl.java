@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.lwa.exception.LWAException;
-import com.brix.Seller_Sync.lwa.payload.LWARequest;
+import com.brix.Seller_Sync.lwa.payload.LWAAccessTokenRequestMeta;
 import com.brix.Seller_Sync.lwa.payload.LWAResponse;
 import com.brix.Seller_Sync.lwa.service.LWAService;
 
@@ -28,7 +28,7 @@ public class LWAServiceImpl implements LWAService {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
 
-        HttpEntity<LWARequest> request = new HttpEntity<>(client.toAuthRequest(), headers);
+        HttpEntity<LWAAccessTokenRequestMeta> request = new HttpEntity<>(client.toAuthRequest(), headers);
 
         try {
             log.info("Refreshing: " + client.getClientId());
