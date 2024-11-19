@@ -1,5 +1,6 @@
 package com.brix.Seller_Sync.amzn.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -14,6 +15,7 @@ import com.brix.Seller_Sync.amzn.payload.ReportDocument;
 import com.brix.Seller_Sync.amzn.service.AmznSPReportService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.AppConstants;
+import com.brix.Seller_Sync.lwa.service.LWAService;
 
 import lombok.extern.java.Log;
 
@@ -21,16 +23,21 @@ import lombok.extern.java.Log;
 @Log
 public class AmznSPReportServiceImpl implements AmznSPReportService {
 
+    @Autowired
+    private LWAService lwaService;
+
     @Override
     public CreateReportResponse createReport(Client client, CreateReportSpecification createReportSpecification) {
         // TODO add a key value pair to hold if there is existing report that is not yet completed
 
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports";
         RestTemplate restTemplate = new RestTemplate();
-
         HttpHeaders headers = new HttpHeaders();
+
+        String accessToken = lwaService.getAccessToken(client);
+
         headers.set("Content-Type", "application/json");
-        headers.set("x-amz-access-token", client.getAccessToken());
+        headers.set("x-amz-access-token", accessToken);
         
         HttpEntity<CreateReportSpecification> request = new HttpEntity<>(createReportSpecification, headers);
         
@@ -48,9 +55,11 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
     public Report getReport(Client client, String reportId) {
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports/" + reportId;
         RestTemplate restTemplate = new RestTemplate();
-
         HttpHeaders headers = new HttpHeaders();
-        headers.set("x-amz-access-token", client.getAccessToken());
+
+        String accessToken = lwaService.getAccessToken(client);
+
+        headers.set("x-amz-access-token", accessToken);
         
         HttpEntity<?> request = new HttpEntity<>(headers);
         
@@ -69,9 +78,11 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
     public ReportDocument getReportDocument(Client client, String reportDocumentId) {
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/documents/" + reportDocumentId;
         RestTemplate restTemplate = new RestTemplate();
-
         HttpHeaders headers = new HttpHeaders();
-        headers.set("x-amz-access-token", client.getAccessToken());
+
+        String accessToken = lwaService.getAccessToken(client);
+
+        headers.set("x-amz-access-token", accessToken);
         
         HttpEntity<?> request = new HttpEntity<>(headers);
         

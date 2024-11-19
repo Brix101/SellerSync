@@ -1,8 +1,5 @@
 package com.brix.Seller_Sync.client;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-
 import com.brix.Seller_Sync.common.entity.BaseEntity;
 import com.brix.Seller_Sync.lwa.payload.LWAAccessTokenRequestMeta;
 import com.brix.Seller_Sync.store.Store;
@@ -50,41 +47,10 @@ public class Client extends BaseEntity {
     private String refreshToken;
 
     @JsonIgnore
-    @Column(length = 1024, columnDefinition = "TEXT")
-    private String accessToken;
-
-    @JsonIgnore
-    @Column()
-    private String tokenType;
-
-    @JsonIgnore
-    @Column()
-    private LocalDateTime expiresAt;
-
-    @JsonIgnore
-    @Column()
-    private String error;
-
-    @JsonIgnore
-    @Column(length = 1024, columnDefinition = "TEXT")
-    private String errorDescription;
-
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "store_id", nullable = false)
     @ToString.Exclude
     private Store store;
-
-    public void setExpiresAtFromExpiresIn(long expiresIn) {
-        this.expiresAt = LocalDateTime.now().plus(expiresIn, ChronoUnit.SECONDS);
-    }
-
-    @JsonIgnore
-    public boolean isTokenExpired() {
-        LocalDateTime localDateTime = LocalDateTime.now();
-
-        return expiresAt == null || expiresAt.isBefore(localDateTime) || expiresAt.isEqual(localDateTime);
-    }
 
     @JsonIgnore
     public LWAAccessTokenRequestMeta toAuthRequest() {
