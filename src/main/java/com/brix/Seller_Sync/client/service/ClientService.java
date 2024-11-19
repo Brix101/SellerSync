@@ -17,6 +17,8 @@ public interface ClientService {
 
     ResponseEntity<Client> getClient(Long id);
 
+    Client getClientByClientId(String clientId);
+
     ResponseEntity<Client> addClient(Client client);
 
     ResponseEntity<Client> updateClient(Long id, Client client);

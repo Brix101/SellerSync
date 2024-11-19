@@ -1,6 +1,7 @@
 package com.brix.Seller_Sync.amzn.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,9 +27,21 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
     @Autowired
     private LWAService lwaService;
 
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+
     @Override
     public CreateReportResponse createReport(Client client, CreateReportSpecification createReportSpecification) {
-        // TODO add a key value pair to hold if there is existing report that is not yet completed
+        log.info("Creating report for client " + client.getClientId());
+
+        String reportKey = AppConstants.PREFIX_REPORT_KEY + client.getClientId() + ":" + createReportSpecification.hashCode();
+
+        String existingReportId = redisTemplate.opsForValue().get(reportKey);
+        if (existingReportId != null) {
+            log.info("Report already exists: " + existingReportId);
+            return new CreateReportResponse(existingReportId);
+        }
 
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports";
         RestTemplate restTemplate = new RestTemplate();
@@ -47,8 +60,15 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
             request,
             CreateReportResponse.class
         );
+
+        CreateReportResponse createReportResponse = response.getBody();
+
+        if (createReportResponse != null) {
+            log.info("Report created: " + createReportResponse.getReportId());
+            redisTemplate.opsForValue().set(reportKey, createReportResponse.getReportId());
+        }
         
-        return response.getBody();
+        return createReportResponse;
     }
 
     @Override

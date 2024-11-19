@@ -13,6 +13,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.brix.Seller_Sync.client.Client;
+import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.lwa.exception.LWAException;
 import com.brix.Seller_Sync.lwa.payload.LWAAccessTokenRequestMeta;
 import com.brix.Seller_Sync.lwa.payload.LWATokenResponse;
@@ -55,12 +56,12 @@ public class LWAServiceImpl implements LWAService {
     }
 
     private void addAccessToken(String clientId, LWATokenResponse token) {
-        redisTemplate.opsForValue().set(clientId, token.getAccessToken(), token.getExpiresIn() - 60, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(AppConstants.PREFIX_CLIENT_KEY + clientId, token.getAccessToken(), token.getExpiresIn() - 60, TimeUnit.SECONDS);
     }
 
     @Override
     public String getAccessToken(Client client) {
-        String accessToken = redisTemplate.opsForValue().get(client.getClientId());
+        String accessToken = redisTemplate.opsForValue().get(AppConstants.PREFIX_CLIENT_KEY + client.getClientId());
 
         if (accessToken == null) {
             try {
