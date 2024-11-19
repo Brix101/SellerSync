@@ -38,7 +38,7 @@ public class LWAServiceImpl implements LWAService {
         HttpEntity<LWAAccessTokenRequestMeta> request = new HttpEntity<>(client.toAuthRequest(), headers);
 
         try {
-            log.info("Refreshing: " + client.getClientId());
+            log.info("Refreshing access token for client " + client.getClientId());
 
             ResponseEntity<LWATokenResponse> response = restTemplate.exchange(url, HttpMethod.POST, request, LWATokenResponse.class);
             

@@ -29,8 +29,8 @@ public class MarketplaceScheduledTasks {
     private MarketplaceService marketplaceService;
 
 
-    // @Scheduled(cron = "0 0 0 * * ?") 
-    @Scheduled(cron = "0 0/30 * * * ?") // Every 30 minutes
+    @Scheduled(cron = "0 0 0 * * ?") 
+    // @Scheduled(cron = "0 0/30 * * * ?") // Every 30 minutes
     public void performMarkerplaceUpdateCron(){
         log.info("Starting marketplace update cron job");
 
