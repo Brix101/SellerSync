@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.amazon.exception;
+package com.brix.Seller_Sync.lwa.exception;
 
 public class LWAException extends Exception {
 

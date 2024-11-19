@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MarketplaceReposity extends JpaRepository<Marketplace, Long> {
 
-    Page<Marketplace> findPageByStoreId(Long storeId, Pageable pageable);
+    Page<Marketplace> findByStoreId(Long storeId, Pageable pageable);
 
     List<Marketplace> findAllByStoreId(Long storeId);
 }

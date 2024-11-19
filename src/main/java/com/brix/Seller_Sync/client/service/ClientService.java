@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 
-import com.brix.Seller_Sync.amazon.exception.LWAException;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
+import com.brix.Seller_Sync.lwa.exception.LWAException;
 
 public interface ClientService {
 
-    PagedResponse<Client> getAllClientByStore(Long storeId, int page, int size);
+    PagedResponse<Client> getClientsByStore(Long storeId, int page, int size);
 
     List<Client> getAllSPClientsToken(); 
 

@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.amazon.payload;
+package com.brix.Seller_Sync.amzn.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

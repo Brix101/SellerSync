@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.brix.Seller_Sync.amazon.payload.marketplace.AmznMarketplace;
-import com.brix.Seller_Sync.amazon.service.AmznMarketplaceService;
+import com.brix.Seller_Sync.amzn.payload.marketplace.AmznMarketplace;
+import com.brix.Seller_Sync.amzn.service.AmznMarketplaceService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.service.ClientService;
 import com.brix.Seller_Sync.marketplace.service.MarketplaceService;

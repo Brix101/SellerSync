@@ -3,8 +3,8 @@ package com.brix.Seller_Sync.client;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import com.brix.Seller_Sync.amazon.payload.LWARequest;
 import com.brix.Seller_Sync.common.entity.BaseEntity;
+import com.brix.Seller_Sync.lwa.payload.LWARequest;
 import com.brix.Seller_Sync.store.Store;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

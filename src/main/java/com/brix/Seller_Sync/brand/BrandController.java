@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.brix.Seller_Sync.brand.service.BrandService;
+import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
-import com.brix.Seller_Sync.common.utils.AppConstants;
 
 @RestController
 @RequestMapping("/api/brands")

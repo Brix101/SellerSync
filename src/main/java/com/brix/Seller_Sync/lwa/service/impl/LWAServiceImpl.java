@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.amazon.service.impl;
+package com.brix.Seller_Sync.lwa.service.impl;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -8,17 +8,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import com.brix.Seller_Sync.amazon.exception.LWAException;
-import com.brix.Seller_Sync.amazon.payload.LWARequest;
-import com.brix.Seller_Sync.amazon.payload.LWAResponse;
-import com.brix.Seller_Sync.amazon.service.AmznLWAService;
 import com.brix.Seller_Sync.client.Client;
+import com.brix.Seller_Sync.lwa.exception.LWAException;
+import com.brix.Seller_Sync.lwa.payload.LWARequest;
+import com.brix.Seller_Sync.lwa.payload.LWAResponse;
+import com.brix.Seller_Sync.lwa.service.LWAService;
 
 import lombok.extern.java.Log;
 
 @Service
 @Log
-public class AmznLWAServiceImpl implements AmznLWAService {
+public class LWAServiceImpl implements LWAService {
 
     @Override
     public LWAResponse getAccessToken(Client client) throws LWAException {

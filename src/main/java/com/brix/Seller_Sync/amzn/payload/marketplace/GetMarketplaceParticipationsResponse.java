@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.amazon.payload.marketplace;
+package com.brix.Seller_Sync.amzn.payload.marketplace;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.amazon.service.impl;
+package com.brix.Seller_Sync.amzn.service.impl;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,12 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.brix.Seller_Sync.amazon.AmznConstants;
-import com.brix.Seller_Sync.amazon.payload.marketplace.AmznMarketplace;
-import com.brix.Seller_Sync.amazon.payload.marketplace.GetMarketplaceParticipationsResponse;
-import com.brix.Seller_Sync.amazon.payload.marketplace.MarketplaceEntry;
-import com.brix.Seller_Sync.amazon.service.AmznMarketplaceService;
+import com.brix.Seller_Sync.amzn.payload.marketplace.AmznMarketplace;
+import com.brix.Seller_Sync.amzn.payload.marketplace.GetMarketplaceParticipationsResponse;
+import com.brix.Seller_Sync.amzn.payload.marketplace.MarketplaceEntry;
+import com.brix.Seller_Sync.amzn.service.AmznMarketplaceService;
 import com.brix.Seller_Sync.client.Client;
+import com.brix.Seller_Sync.common.AppConstants;
 
 import lombok.extern.java.Log;
 
@@ -53,7 +53,7 @@ public class AmznMarketplaceServiceImpl implements AmznMarketplaceService {
     @Override
     public List<AmznMarketplace> getMarketplaceParticipations(Client client) {
         try {
-            String url = AmznConstants.SP_API_URL + "/sellers/v1/marketplaceParticipations";
+            String url = AppConstants.SP_API_URL + "/sellers/v1/marketplaceParticipations";
             RestTemplate restTemplate = new RestTemplate();
 
             HttpHeaders headers = new HttpHeaders();

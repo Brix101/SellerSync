@@ -1,6 +1,8 @@
-package com.brix.Seller_Sync.common.utils;
+package com.brix.Seller_Sync.common;
 
 public class AppConstants {
+    public static final String SP_API_URL = "https://sellingpartnerapi-na.amazon.com";
+
     public static final String DEFAULT_PAGE_NUMBER = "0";
 
     public static final String DEFAULT_PAGE_SIZE = "30";

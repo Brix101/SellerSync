@@ -1,9 +1,9 @@
-package com.brix.Seller_Sync.amazon.service;
+package com.brix.Seller_Sync.amzn.service;
 
-import com.brix.Seller_Sync.amazon.payload.CreateReportResponse;
-import com.brix.Seller_Sync.amazon.payload.CreateReportSpecification;
-import com.brix.Seller_Sync.amazon.payload.Report;
-import com.brix.Seller_Sync.amazon.payload.ReportDocument;
+import com.brix.Seller_Sync.amzn.payload.CreateReportResponse;
+import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification;
+import com.brix.Seller_Sync.amzn.payload.Report;
+import com.brix.Seller_Sync.amzn.payload.ReportDocument;
 import com.brix.Seller_Sync.client.Client;
 
 public interface AmznSPReportService {

@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.service.ClientService;
+import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.common.payload.ApiResponse;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
-import com.brix.Seller_Sync.common.utils.AppConstants;
+import com.brix.Seller_Sync.marketplace.Marketplace;
+import com.brix.Seller_Sync.marketplace.service.MarketplaceService;
 import com.brix.Seller_Sync.store.service.StoreService;
 
 import jakarta.validation.Valid;
@@ -34,6 +36,9 @@ public class StoreController {
 
     @Autowired
     private ClientService clientService;
+
+    @Autowired
+    private MarketplaceService marketplaceService;
 
     @GetMapping
     public PagedResponse<Store> getAllStores(
@@ -72,7 +77,7 @@ public class StoreController {
         @RequestParam(name = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
         @RequestParam(name = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size
     ){
-        PagedResponse<Client> response = clientService.getAllClientByStore(id, page, size);
+        PagedResponse<Client> response = clientService.getClientsByStore(id, page, size);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -83,6 +88,17 @@ public class StoreController {
             @RequestBody Client client
     ){
         return storeService.addClient(storeId, client);
+    }
+
+    @GetMapping("/{id}/marketplaces")
+    public ResponseEntity<PagedResponse<Marketplace>> getAllMarketplacesByStore(
+        @PathVariable(name = "id") Long id,
+        @RequestParam(name = "page", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) Integer page,
+        @RequestParam(name = "size", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) Integer size
+    ){
+        PagedResponse<Marketplace> response = marketplaceService.getMarterplacesByStore(id, page, size);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

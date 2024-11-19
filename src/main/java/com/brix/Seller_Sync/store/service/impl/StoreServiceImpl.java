@@ -14,10 +14,10 @@ import org.springframework.stereotype.Service;
 
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.service.ClientService;
+import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.common.exception.ResourceNotFoundException;
 import com.brix.Seller_Sync.common.payload.ApiResponse;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
-import com.brix.Seller_Sync.common.utils.AppConstants;
 import com.brix.Seller_Sync.common.utils.AppUtils;
 import com.brix.Seller_Sync.store.Store;
 import com.brix.Seller_Sync.store.StoreRepository;

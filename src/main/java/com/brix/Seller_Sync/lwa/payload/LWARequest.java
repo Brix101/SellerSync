@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.amazon.payload;
+package com.brix.Seller_Sync.lwa.payload;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

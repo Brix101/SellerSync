@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.amazon;
+package com.brix.Seller_Sync.lwa;
 
 public enum LWAExceptionErrorCode {
     access_denied,

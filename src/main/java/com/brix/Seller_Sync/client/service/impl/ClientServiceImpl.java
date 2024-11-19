@@ -12,16 +12,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.brix.Seller_Sync.amazon.exception.LWAException;
-import com.brix.Seller_Sync.amazon.payload.LWAResponse;
-import com.brix.Seller_Sync.amazon.service.AmznLWAService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.ClientRepository;
 import com.brix.Seller_Sync.client.service.ClientService;
+import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.common.exception.ResourceNotFoundException;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
-import com.brix.Seller_Sync.common.utils.AppConstants;
 import com.brix.Seller_Sync.common.utils.AppUtils;
+import com.brix.Seller_Sync.lwa.exception.LWAException;
+import com.brix.Seller_Sync.lwa.payload.LWAResponse;
+import com.brix.Seller_Sync.lwa.service.LWAService;
 
 import lombok.extern.java.Log;
 
@@ -33,11 +33,11 @@ public class ClientServiceImpl implements ClientService {
     private ClientRepository clientRepository;
 
     @Autowired 
-    private AmznLWAService lwaService;
+    private LWAService lwaService;
 
 
     @Override
-    public PagedResponse<Client> getAllClientByStore(Long storeId, int page, int size) {
+    public PagedResponse<Client> getClientsByStore(Long storeId, int page, int size) {
         AppUtils.validatePageNumberAndSize(page, size);
 
         Pageable pageable = PageRequest.of(page, size, Sort.Direction.DESC, AppConstants.CREATED_AT);
@@ -45,7 +45,6 @@ public class ClientServiceImpl implements ClientService {
         Page<Client> clients = clientRepository.findPageByStoreId(storeId, pageable);
 
         List<Client> content = clients.getNumberOfElements() == 0 ? Collections.emptyList() : clients.getContent();
-
 
         return new PagedResponse<>(content, clients.getNumber(), clients.getSize(), clients.getTotalElements(), clients.getTotalPages(), clients.isLast());
     }

@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.amazon.payload;
+package com.brix.Seller_Sync.amzn.payload;
 
 import java.util.List;
 import java.util.Map;

@@ -1,5 +1,6 @@
 package com.brix.Seller_Sync.common.utils;
 
+import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.common.exception.BadRequestException;
 
 public class AppUtils {
