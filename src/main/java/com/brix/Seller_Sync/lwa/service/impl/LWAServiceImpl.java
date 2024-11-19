@@ -1,5 +1,9 @@
 package com.brix.Seller_Sync.lwa.service.impl;
 
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.lwa.exception.LWAException;
 import com.brix.Seller_Sync.lwa.payload.LWAAccessTokenRequestMeta;
-import com.brix.Seller_Sync.lwa.payload.LWAResponse;
+import com.brix.Seller_Sync.lwa.payload.LWATokenResponse;
 import com.brix.Seller_Sync.lwa.service.LWAService;
 
 import lombok.extern.java.Log;
@@ -19,9 +23,12 @@ import lombok.extern.java.Log;
 @Service
 @Log
 public class LWAServiceImpl implements LWAService {
+   
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
-    @Override
-    public LWAResponse getAccessToken(Client client) throws LWAException {
+
+    private LWATokenResponse refreshAccessToken(Client client) throws LWAException {
         String url = "https://api.amazon.com/auth/o2/token";
         RestTemplate restTemplate = new RestTemplate();
 
@@ -33,17 +40,39 @@ public class LWAServiceImpl implements LWAService {
         try {
             log.info("Refreshing: " + client.getClientId());
 
-            ResponseEntity<LWAResponse> response = restTemplate.exchange(url, HttpMethod.POST, request, LWAResponse.class);
+            ResponseEntity<LWATokenResponse> response = restTemplate.exchange(url, HttpMethod.POST, request, LWATokenResponse.class);
             
             return response.getBody();
             
         }  catch (HttpClientErrorException.BadRequest e) {
-            LWAResponse responseBody = e.getResponseBodyAs(LWAResponse.class);
+            LWATokenResponse responseBody = e.getResponseBodyAs(LWATokenResponse.class);
             
             throw new LWAException(responseBody.getError(), responseBody.getErrorDescription(), "Error getting LWA Token");
         } catch (Exception e) {
             throw new RuntimeException("Error getting LWA Token", e);
         }
 
+    }
+
+    private void addAccessToken(String clientId, LWATokenResponse token) {
+        redisTemplate.opsForValue().set(clientId, token.getAccessToken(), token.getExpiresIn() - 60, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public String getAccessToken(Client client) {
+        String accessToken = redisTemplate.opsForValue().get(client.getClientId());
+
+        if (accessToken == null) {
+            try {
+                LWATokenResponse newToken = refreshAccessToken(client);
+
+                addAccessToken(client.getClientId(), newToken);
+
+                accessToken = newToken.getAccessToken();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return accessToken;
     }
 }

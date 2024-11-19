@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
-import com.brix.Seller_Sync.lwa.exception.LWAException;
 
 public interface ClientService {
 
@@ -23,6 +22,4 @@ public interface ClientService {
     ResponseEntity<Client> updateClient(Long id, Client client);
 
     ResponseEntity<Client> deleteClient(Long id);
-
-    Client refreshAccessToken(Long id) throws LWAException;
 }

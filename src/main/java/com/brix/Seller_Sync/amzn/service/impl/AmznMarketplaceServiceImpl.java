@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,12 +19,16 @@ import com.brix.Seller_Sync.amzn.payload.marketplace.MarketplaceEntry;
 import com.brix.Seller_Sync.amzn.service.AmznMarketplaceService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.AppConstants;
+import com.brix.Seller_Sync.lwa.service.LWAService;
 
 import lombok.extern.java.Log;
 
 @Service
 @Log
 public class AmznMarketplaceServiceImpl implements AmznMarketplaceService {
+
+    @Autowired
+    private LWAService lwaCacheService;
 
     private List<MarketplaceEntry> marketplaceEntries = Arrays.asList(
             new MarketplaceEntry("A2EUQ1WTGCTBG2", "CA", "Canada", "NorthAmerica"),
@@ -55,9 +60,12 @@ public class AmznMarketplaceServiceImpl implements AmznMarketplaceService {
         try {
             String url = AppConstants.SP_API_URL + "/sellers/v1/marketplaceParticipations";
             RestTemplate restTemplate = new RestTemplate();
-
             HttpHeaders headers = new HttpHeaders();
-            headers.set("x-amz-access-token", client.getAccessToken());
+
+
+            String accessToken = lwaCacheService.getAccessToken(client);
+
+            headers.set("x-amz-access-token", accessToken);
 
             HttpEntity<?> request = new HttpEntity<>(headers);
 

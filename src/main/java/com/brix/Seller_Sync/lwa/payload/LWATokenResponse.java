@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LWAResponse {
+public class LWATokenResponse {
 
     @JsonProperty("access_token")
     private String accessToken;
