@@ -89,6 +89,7 @@ public class ProductScheduledTasks {
                     List<Listing> listings = listingService.parseListingDocument(reportDocument);
 
                     for (Listing listing : listings){
+                        listing.setStoreId(client.getStore().getId());
                         productService.upsertListing(listing);
                     }
 

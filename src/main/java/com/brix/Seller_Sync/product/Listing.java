@@ -11,4 +11,5 @@ public class Listing {
     private String sellerSku;
     private String asin;
     private String status;
+    private Long storeId;
 }

@@ -44,7 +44,7 @@ public class ListingService {
                         String status = columns[28];
 
                         if (!asin.isEmpty()) {
-                            listings.add(new Listing(sellerSku, asin, status));
+                            listings.add(new Listing(sellerSku, asin, status, 0L));
                         }
                     }
                 }

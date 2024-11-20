@@ -21,18 +21,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product upsertListing(Listing listing) {
-        // Optional<Product> existingProduct = productRepository.findById(product.getId());
-        // if (existingProduct.isPresent()) {
-        //     Product updatedProduct = existingProduct.get();
-        //     updatedProduct.setSellerSKU(product.getSellerSKU());
-        //     updatedProduct.setAsin(product.getAsin());
-        //     updatedProduct.setStatus(product.getStatus());
-        //     return productRepository.save(updatedProduct);
-        // } else {
-        //     return productRepository.save(product);
-        // }
-
-        return productRepository.upsertByAsin(listing.getSellerSku(), listing.getAsin(), listing.getStatus());
+        return productRepository.upsertByAsin(listing.getSellerSku(), listing.getAsin(), listing.getStatus(), listing.getStoreId());
     }
 
 }
