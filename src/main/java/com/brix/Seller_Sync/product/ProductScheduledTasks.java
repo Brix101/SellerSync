@@ -3,6 +3,7 @@ package com.brix.Seller_Sync.product;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import com.brix.Seller_Sync.amzn.payload.ReportDocument;
 import com.brix.Seller_Sync.amzn.service.AmznSPReportService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.service.ClientService;
-import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.marketplace.Marketplace;
 import com.brix.Seller_Sync.product.service.ListingService;
 import com.brix.Seller_Sync.product.service.ProductService;
@@ -44,11 +44,13 @@ public class ProductScheduledTasks {
     @Autowired
     private ProductService productService;
 
+    private static final String LISTING_REPORT_KEY = "listing_report:";
+
     @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
     public void createListingReport() {
-        log.info("Product cron task executed");
-        
+        // TODO move this to a service with a filter for all the store clients
         List<Client> clients = clientService.getAllSPClientsToken();
+        Set<String> keys = getReportKeys();
 
         for (Client client : clients){
             List<Marketplace> marketplaces = client.getStore().getMarketplaces();
@@ -59,16 +61,19 @@ public class ProductScheduledTasks {
             createReportSpecification.setReportType(ReportType.GET_MERCHANT_LISTINGS_ALL_DATA);
             createReportSpecification.setMarketplaceIds(marketplaceIds);
 
-            amznSPReportService.createReport(client, createReportSpecification);
+            CreateReportResponse createReportResponse = amznSPReportService.createReport(client, createReportSpecification);
+
+            if (createReportResponse.getReportId() != null && !keys.contains(LISTING_REPORT_KEY + client.getClientId())){
+                enqueueReport(client.getClientId(), createReportResponse.getReportId());
+            }
         }
     }
 
     @Scheduled(fixedDelay = 5000) // This cron expression means every 5 seconds
     public void getAllReports(){
-        Set<String> keys = redisTemplate.keys(AppConstants.PREFIX_REPORT_KEY + "*");
+        Set<String> keys = getReportKeys();
 
         if (keys != null){
-            log.info("Parsing reports");
             for (String key : keys){
                 String cliendId = key.split(":")[1];
 
@@ -82,16 +87,27 @@ public class ProductScheduledTasks {
                 if (report.getReportDocumentId() != null){
                     ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
                     List<Listing> listings = listingService.parseListingDocument(reportDocument);
-                    
 
                     for (Listing listing : listings){
                         productService.upsertListing(listing);
                     }
 
-                    redisTemplate.delete(key);
+                    dequeueReport(cliendId);
                 }
             }
         }
 
+    }
+
+    private void enqueueReport(String clientId, String reportId){
+        redisTemplate.opsForValue().set(LISTING_REPORT_KEY + clientId, reportId, 1, TimeUnit.DAYS);
+    }
+
+    private void dequeueReport(String clientId){
+        redisTemplate.delete(LISTING_REPORT_KEY + clientId);
+    }
+
+    private Set<String> getReportKeys(){
+        return redisTemplate.keys(LISTING_REPORT_KEY + "*");
     }
 }

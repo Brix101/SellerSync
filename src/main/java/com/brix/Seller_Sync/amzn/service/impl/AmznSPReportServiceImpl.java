@@ -1,5 +1,7 @@
 package com.brix.Seller_Sync.amzn.service.impl;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -30,10 +32,9 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-
     @Override
     public CreateReportResponse createReport(Client client, CreateReportSpecification createReportSpecification) {
-        String reportKey = AppConstants.PREFIX_REPORT_KEY + client.getClientId() + ":" + createReportSpecification.hashCode();
+        String reportKey = client.getClientId() + ":" + createReportSpecification.hashCode();
 
         String existingReportId = redisTemplate.opsForValue().get(reportKey);
         if (existingReportId != null) {
@@ -61,7 +62,7 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
         CreateReportResponse createReportResponse = response.getBody();
 
         if (createReportResponse != null) {
-            redisTemplate.opsForValue().set(reportKey, createReportResponse.getReportId());
+            redisTemplate.opsForValue().set(reportKey, createReportResponse.getReportId(), 3600, TimeUnit.SECONDS);
         }
         
         return createReportResponse;
@@ -70,7 +71,6 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
     @Override
     public Report getReport(Client client, CreateReportResponse createReportResponse) {
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports/" + createReportResponse.getReportId();
-
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 
