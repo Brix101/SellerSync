@@ -33,13 +33,10 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
     @Override
     public CreateReportResponse createReport(Client client, CreateReportSpecification createReportSpecification) {
-        log.info("Creating report for client " + client.getClientId());
-
         String reportKey = AppConstants.PREFIX_REPORT_KEY + client.getClientId() + ":" + createReportSpecification.hashCode();
 
         String existingReportId = redisTemplate.opsForValue().get(reportKey);
         if (existingReportId != null) {
-            log.info("Report already exists: " + existingReportId);
             return new CreateReportResponse(existingReportId);
         }
 
@@ -64,7 +61,6 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
         CreateReportResponse createReportResponse = response.getBody();
 
         if (createReportResponse != null) {
-            log.info("Created " + createReportSpecification.getReportType() + " report : " + createReportResponse.getReportId());
             redisTemplate.opsForValue().set(reportKey, createReportResponse.getReportId());
         }
         
@@ -72,8 +68,9 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
     }
 
     @Override
-    public Report getReport(Client client, String reportId) {
-        String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports/" + reportId;
+    public Report getReport(Client client, CreateReportResponse createReportResponse) {
+        String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports/" + createReportResponse.getReportId();
+
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 
@@ -113,8 +110,10 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
             ReportDocument.class
         );
         
-        log.info("ReportDocument: " + response.getBody().getReportDocumentId());
         return response.getBody();
     }
 
+    private String getReportKey(Client client, String reportId) {
+        return "spReport:" + client.getClientId() + ":" + reportId;
+    }
 }

@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.brix.Seller_Sync.amzn.payload.CreateReportResponse;
 import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification;
 import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification.ReportType;
 import com.brix.Seller_Sync.amzn.payload.Report;
@@ -43,7 +44,7 @@ public class ProductScheduledTasks {
     @Autowired
     private ProductService productService;
 
-    @Scheduled(cron = "*/30 * * * * ?") // This cron expression means every day at midnight
+    @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
     public void createListingReport() {
         log.info("Product cron task executed");
         
@@ -60,22 +61,23 @@ public class ProductScheduledTasks {
 
             amznSPReportService.createReport(client, createReportSpecification);
         }
-
     }
 
     @Scheduled(fixedDelay = 5000) // This cron expression means every 5 seconds
     public void getAllReports(){
-        log.info("Getting all reports");
         Set<String> keys = redisTemplate.keys(AppConstants.PREFIX_REPORT_KEY + "*");
 
         if (keys != null){
+            log.info("Parsing reports");
             for (String key : keys){
                 String cliendId = key.split(":")[1];
 
                 Client client = clientService.getClientByClientId(cliendId);
                 String reportId = redisTemplate.opsForValue().get(key);
 
-                Report report = amznSPReportService.getReport(client, reportId);
+                CreateReportResponse createReportResponse = new CreateReportResponse(reportId);
+
+                Report report = amznSPReportService.getReport(client, createReportResponse);
 
                 if (report.getReportDocumentId() != null){
                     ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
@@ -86,17 +88,10 @@ public class ProductScheduledTasks {
                         productService.upsertListing(listing);
                     }
 
-                    log.info("Successfully parsed listings");
                     redisTemplate.delete(key);
                 }
             }
         }
 
     }
-
-    // @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every 30 seconds
-    // public void performTask() {
-        // Your task logic here
-        // log.info("Product cron task executed every 30 seconds");
-    // }
 }

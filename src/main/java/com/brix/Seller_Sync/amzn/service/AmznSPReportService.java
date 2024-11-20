@@ -10,7 +10,7 @@ public interface AmznSPReportService {
 
     CreateReportResponse createReport(Client client, CreateReportSpecification createReportSpecification);
 
-    Report getReport(Client client, String reportId);
+    Report getReport(Client client, CreateReportResponse createReportResponse);
 
     ReportDocument getReportDocument(Client client, Report report);
 }

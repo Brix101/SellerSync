@@ -30,8 +30,6 @@ public class ListingService {
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
 
-            log.info(response.getStatusCode().toString());
-
             List<Listing> listings = new ArrayList<>();
 
             String data = response.getBody();
