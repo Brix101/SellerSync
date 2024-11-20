@@ -12,5 +12,5 @@ public interface AmznSPReportService {
 
     Report getReport(Client client, String reportId);
 
-    ReportDocument getReportDocument(Client client, String reportDocumentId);
+    ReportDocument getReportDocument(Client client, Report report);
 }

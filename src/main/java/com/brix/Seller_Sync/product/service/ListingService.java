@@ -13,7 +13,10 @@ import org.springframework.web.client.RestTemplate;
 import com.brix.Seller_Sync.amzn.payload.ReportDocument;
 import com.brix.Seller_Sync.product.Listing;
 
+import lombok.extern.java.Log;
+
 @Service
+@Log
 public class ListingService {
 
     public List<Listing> parseListingDocument(ReportDocument reportDocument) {
@@ -23,7 +26,11 @@ public class ListingService {
         HttpEntity<?> request = new HttpEntity<>(headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.exchange(reportDocument.getUrl(), HttpMethod.GET, request, String.class);
+            String url = reportDocument.getDecodedUrl();
+
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+
+            log.info(response.getStatusCode().toString());
 
             List<Listing> listings = new ArrayList<>();
 
@@ -46,7 +53,7 @@ public class ListingService {
             }
             return listings;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.info(e.getMessage());
             return new ArrayList<>();
         }
     }

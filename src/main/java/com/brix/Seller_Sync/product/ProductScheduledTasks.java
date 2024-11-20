@@ -10,7 +10,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.brix.Seller_Sync.amzn.payload.CreateReportResponse;
 import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification;
 import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification.ReportType;
 import com.brix.Seller_Sync.amzn.payload.Report;
@@ -21,6 +20,7 @@ import com.brix.Seller_Sync.client.service.ClientService;
 import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.marketplace.Marketplace;
 import com.brix.Seller_Sync.product.service.ListingService;
+import com.brix.Seller_Sync.product.service.ProductService;
 
 import lombok.extern.java.Log;
 
@@ -40,9 +40,11 @@ public class ProductScheduledTasks {
     @Autowired
     private ListingService listingService;
 
+    @Autowired
+    private ProductService productService;
+
     @Scheduled(cron = "*/30 * * * * ?") // This cron expression means every day at midnight
-    public void performProductCron() {
-        // Your product cron task logic here
+    public void createListingReport() {
         log.info("Product cron task executed");
         
         List<Client> clients = clientService.getAllSPClientsToken();
@@ -52,14 +54,11 @@ public class ProductScheduledTasks {
 
             List<String> marketplaceIds = marketplaces.stream().map(Marketplace::getMarketplaceId).collect(Collectors.toList());
 
-
             CreateReportSpecification createReportSpecification = new CreateReportSpecification();
             createReportSpecification.setReportType(ReportType.GET_MERCHANT_LISTINGS_ALL_DATA);
             createReportSpecification.setMarketplaceIds(marketplaceIds);
 
-            CreateReportResponse createReportResponse = amznSPReportService.createReport(client, createReportSpecification);
-
-            log.info(createReportResponse.toString());
+            amznSPReportService.createReport(client, createReportSpecification);
         }
 
     }
@@ -79,14 +78,15 @@ public class ProductScheduledTasks {
                 Report report = amznSPReportService.getReport(client, reportId);
 
                 if (report.getReportDocumentId() != null){
-                    ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report.getReportDocumentId());
-                    
-                    log.info(reportDocument.toString());
+                    ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
                     List<Listing> listings = listingService.parseListingDocument(reportDocument);
                     
-                    log.info("Successfully parsed listings");
-                    log.info(listings.toString());
 
+                    for (Listing listing : listings){
+                        productService.upsertListing(listing);
+                    }
+
+                    log.info("Successfully parsed listings");
                     redisTemplate.delete(key);
                 }
             }
@@ -94,9 +94,9 @@ public class ProductScheduledTasks {
 
     }
 
-    @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every 30 seconds
-    public void performTask() {
+    // @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every 30 seconds
+    // public void performTask() {
         // Your task logic here
         // log.info("Product cron task executed every 30 seconds");
-    }
+    // }
 }

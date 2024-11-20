@@ -64,7 +64,7 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
         CreateReportResponse createReportResponse = response.getBody();
 
         if (createReportResponse != null) {
-            log.info("Report created: " + createReportResponse.getReportId());
+            log.info("Created " + createReportSpecification.getReportType() + " report : " + createReportResponse.getReportId());
             redisTemplate.opsForValue().set(reportKey, createReportResponse.getReportId());
         }
         
@@ -95,8 +95,8 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
 
     @Override
-    public ReportDocument getReportDocument(Client client, String reportDocumentId) {
-        String url = AppConstants.SP_API_URL + "/reports/2021-06-30/documents/" + reportDocumentId;
+    public ReportDocument getReportDocument(Client client, Report report) {
+        String url = AppConstants.SP_API_URL + "/reports/2021-06-30/documents/" + report.getReportDocumentId();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 
