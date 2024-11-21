@@ -49,7 +49,9 @@ public class StoreController {
     }
 
     @PostMapping
-    public ResponseEntity<Store> addStore(@Valid @RequestBody Store store){
+    public ResponseEntity<Store> addStore(
+        @Valid @RequestBody Store store
+        )  {
         return storeService.addStore(store);
     }
 
@@ -85,7 +87,7 @@ public class StoreController {
     @PostMapping("/{id}/clients")
     public ResponseEntity<Client> addClient(
             @PathVariable(name = "id") Long storeId,
-            @RequestBody Client client
+            @Valid @RequestBody Client client
     ){
         return storeService.addClient(storeId, client);
     }
