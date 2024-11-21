@@ -64,6 +64,7 @@ public class ProductScheduledTasks {
             CreateReportResponse createReportResponse = amznSPReportService.createReport(client, createReportSpecification);
 
             if (createReportResponse.getReportId() != null && !keys.contains(LISTING_REPORT_KEY + client.getClientId())){
+                log.info("Enqueuing report for client " + client.getClientId());
                 enqueueReport(client.getClientId(), createReportResponse.getReportId());
             }
         }
@@ -74,6 +75,7 @@ public class ProductScheduledTasks {
         Set<String> keys = getReportKeys();
 
         if (keys != null){
+            log.info("Getting reports for " + keys.size() + " clients");
             for (String key : keys){
                 String cliendId = key.split(":")[1];
 
@@ -96,6 +98,7 @@ public class ProductScheduledTasks {
                     dequeueReport(cliendId);
                 }
             }
+            log.info("Finished getting reports");
         }
 
     }
