@@ -1,13 +1,10 @@
-
 package com.brix.Seller_Sync.product;
 
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -36,21 +33,17 @@ public class ProductScheduledTasks {
     private AmznSPReportService amznSPReportService;
 
     @Autowired
-    private StringRedisTemplate redisTemplate;
-
-    @Autowired
     private ListingService listingService;
 
     @Autowired
     private ProductService productService;
 
-    private static final String LISTING_REPORT_KEY = "listing_report:";
+    private static final ConcurrentHashMap<String, String> reportQueue = new ConcurrentHashMap<>();
 
     @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
     public void createListingReport() {
         // TODO move this to a service with a filter for all the store clients
         List<Client> clients = clientService.getAllSPClientsToken();
-        Set<String> keys = getReportKeys();
 
         for (Client client : clients){
             List<Marketplace> marketplaces = client.getStore().getMarketplaces();
@@ -63,24 +56,20 @@ public class ProductScheduledTasks {
 
             CreateReportResponse createReportResponse = amznSPReportService.createReport(client, createReportSpecification);
 
-            if (createReportResponse.getReportId() != null && !keys.contains(LISTING_REPORT_KEY + client.getClientId())){
-                log.info("Enqueuing report for client " + client.getClientId());
-                enqueueReport(client.getClientId(), createReportResponse.getReportId());
+            String reportKey = client.getClientId() + ":" + createReportResponse.hashCode();
+            if (createReportResponse.getReportId() != null && !reportQueue.containsKey(reportKey)){
+                enqueueReport(reportKey, createReportResponse.getReportId());
             }
         }
     }
 
     @Scheduled(fixedDelay = 5000) // This cron expression means every 5 seconds
     public void getAllReports(){
-        Set<String> keys = getReportKeys();
-
-        if (keys != null){
-            log.info("Getting reports for " + keys.size() + " clients");
-            for (String key : keys){
-                String cliendId = key.split(":")[1];
-
-                Client client = clientService.getClientByClientId(cliendId);
-                String reportId = redisTemplate.opsForValue().get(key);
+        if (!reportQueue.isEmpty()){
+            for (String key : reportQueue.keySet()){
+                String clientId = key.split(":")[0];
+                Client client = clientService.getClientByClientId(clientId);
+                String reportId = reportQueue.get(key);
 
                 CreateReportResponse createReportResponse = new CreateReportResponse(reportId);
 
@@ -90,28 +79,24 @@ public class ProductScheduledTasks {
                     ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
                     List<Listing> listings = listingService.parseListingDocument(reportDocument);
 
+                    log.info("Update listings for client: " + client.getClientId());
                     for (Listing listing : listings){
                         listing.setStoreId(client.getStore().getId());
                         productService.upsertListing(listing);
                     }
-
-                    dequeueReport(cliendId);
+                    
+                    dequeueReport(key);
                 }
             }
-            log.info("Finished getting reports");
         }
-
     }
 
-    private void enqueueReport(String clientId, String reportId){
-        redisTemplate.opsForValue().set(LISTING_REPORT_KEY + clientId, reportId, 1, TimeUnit.DAYS);
+    private void enqueueReport(String key, String reportId){
+        reportQueue.put(key, reportId);
     }
 
-    private void dequeueReport(String clientId){
-        redisTemplate.delete(LISTING_REPORT_KEY + clientId);
+    private void dequeueReport(String key){
+        reportQueue.remove(key);
     }
 
-    private Set<String> getReportKeys(){
-        return redisTemplate.keys(LISTING_REPORT_KEY + "*");
-    }
 }

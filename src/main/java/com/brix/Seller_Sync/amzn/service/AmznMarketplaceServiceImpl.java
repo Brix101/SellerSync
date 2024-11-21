@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.amzn.service.impl;
+package com.brix.Seller_Sync.amzn.service;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,7 +16,6 @@ import org.springframework.web.client.RestTemplate;
 import com.brix.Seller_Sync.amzn.payload.marketplace.AmznMarketplace;
 import com.brix.Seller_Sync.amzn.payload.marketplace.GetMarketplaceParticipationsResponse;
 import com.brix.Seller_Sync.amzn.payload.marketplace.MarketplaceEntry;
-import com.brix.Seller_Sync.amzn.service.AmznMarketplaceService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.lwa.service.LWAService;

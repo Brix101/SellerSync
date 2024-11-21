@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.amzn.service.impl;
+package com.brix.Seller_Sync.amzn.service;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +15,6 @@ import com.brix.Seller_Sync.amzn.payload.CreateReportResponse;
 import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification;
 import com.brix.Seller_Sync.amzn.payload.Report;
 import com.brix.Seller_Sync.amzn.payload.ReportDocument;
-import com.brix.Seller_Sync.amzn.service.AmznSPReportService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.lwa.service.LWAService;
@@ -38,8 +37,11 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
         String existingReportId = redisTemplate.opsForValue().get(reportKey);
         if (existingReportId != null) {
+            log.info("Report already exists for client: " + client.getClientId());
             return new CreateReportResponse(existingReportId);
         }
+
+        log.info("Creating" + createReportSpecification.getReportType() + " report for client: " + client.getClientId());
 
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports";
         RestTemplate restTemplate = new RestTemplate();
@@ -64,12 +66,15 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
         if (createReportResponse != null) {
             redisTemplate.opsForValue().set(reportKey, createReportResponse.getReportId(), 3600, TimeUnit.SECONDS);
         }
-        
+
+        log.info("Report created for client: " + client.getClientId() + " with reportId: " + createReportResponse.getReportId());
         return createReportResponse;
     }
 
     @Override
     public Report getReport(Client client, CreateReportResponse createReportResponse) {
+        log.info("Getting report for reportId: " + createReportResponse.getReportId());
+
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports/" + createReportResponse.getReportId();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -93,6 +98,8 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
     @Override
     public ReportDocument getReportDocument(Client client, Report report) {
+        log.info("Getting report document for reportId: " + report.getReportId());
+
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/documents/" + report.getReportDocumentId();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
