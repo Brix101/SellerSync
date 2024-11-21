@@ -112,8 +112,4 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
         
         return response.getBody();
     }
-
-    private String getReportKey(Client client, String reportId) {
-        return "spReport:" + client.getClientId() + ":" + reportId;
-    }
 }
