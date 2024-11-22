@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.lwa.service.impl;
+package com.brix.Seller_Sync.lwa.service;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +17,6 @@ import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.lwa.exception.LWAException;
 import com.brix.Seller_Sync.lwa.payload.LWAAccessTokenRequestMeta;
 import com.brix.Seller_Sync.lwa.payload.LWATokenResponse;
-import com.brix.Seller_Sync.lwa.service.LWAService;
 
 import lombok.extern.java.Log;
 
@@ -50,7 +49,7 @@ public class LWAServiceImpl implements LWAService {
             
             throw new LWAException(responseBody.getError(), responseBody.getErrorDescription(), "Error getting LWA Token");
         } catch (Exception e) {
-            throw new RuntimeException("Error getting LWA Token", e);
+            throw new RuntimeException("Something went wrong while refreshing the access token", e);
         }
 
     }
