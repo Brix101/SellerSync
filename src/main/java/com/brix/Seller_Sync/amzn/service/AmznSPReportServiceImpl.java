@@ -37,11 +37,11 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
         String existingReportId = redisTemplate.opsForValue().get(reportKey);
         if (existingReportId != null) {
-            log.info("Report already exists for client: " + client.getClientId());
+            log.info(createReportSpecification.getReportType() + " Report already exists for client " + client.getClientId());
             return new CreateReportResponse(existingReportId);
         }
 
-        log.info("Creating" + createReportSpecification.getReportType() + " report for client: " + client.getClientId());
+        log.info("Creating " + createReportSpecification.getReportType() + " report for client " + client.getClientId());
 
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports";
         RestTemplate restTemplate = new RestTemplate();
