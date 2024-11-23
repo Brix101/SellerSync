@@ -29,27 +29,32 @@ public class MarketplaceScheduledTasks {
     private MarketplaceService marketplaceService;
 
 
-    @Scheduled(cron = "0 0 0 * * ?") 
-    // @Scheduled(cron = "0 0/30 * * * ?") // Every 30 minutes
+    @Scheduled(cron = "0 0 0 * * ?")  // Every day at midnight
+    // @Scheduled(cron = "*/30 * * * * ?") // Every 30 seconds
     public void performMarkerplaceUpdateCron(){
         log.info("Starting marketplace update cron job");
 
         List<Client> clients = clientService.getAllSPClientsToken();
 
         for (Client client : clients){
-            List<AmznMarketplace> marketplaces = amznMarketplaceService.getMarketplaceParticipations(client);
-            List<Marketplace> storeMarketplaces = client.getStore().getMarketplaces();
+            try {
+                List<AmznMarketplace> marketplaces = amznMarketplaceService.getMarketplaceParticipations(client);
+                List<Marketplace> storeMarketplaces = client.getStore().getMarketplaces();
 
-            List<String> storeMarketplaceIds = storeMarketplaces.stream().map(Marketplace::getMarketplaceId).collect(Collectors.toList());
-            
-            for (AmznMarketplace amznMarketplace : marketplaces){
-                if (!storeMarketplaceIds.contains(amznMarketplace.getId())){
-                    Marketplace marketplace = amznMarketplace.toMarketplace();
-                    marketplace.setStore(client.getStore());
+                List<String> storeMarketplaceIds = storeMarketplaces.stream().map(Marketplace::getMarketplaceId).collect(Collectors.toList());
+                
+                log.info("Marketplaces for client: " + client.getClientId() + " are: " + marketplaces.size());
+                for (AmznMarketplace amznMarketplace : marketplaces){
+                    if (!storeMarketplaceIds.contains(amznMarketplace.getId())){
+                        Marketplace marketplace = amznMarketplace.toMarketplace();
+                        marketplace.setStore(client.getStore());
 
-                    marketplaceService.addMarketplace(marketplace);
-                    log.info("Added marketplace: " + marketplace.getMarketplaceId() + " to store: " + client.getStore().getName());
+                        marketplaceService.addMarketplace(marketplace);
+                        log.info("Added marketplace: " + marketplace.getMarketplaceId() + " to store: " + client.getStore().getName());
+                    }
                 }
+            } catch (Exception e) {
+                log.severe("Failed to update marketplaces for client: " + client.getId() + " due to: " + e.getMessage());
             }
         }
 

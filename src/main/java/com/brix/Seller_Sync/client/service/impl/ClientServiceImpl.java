@@ -13,12 +13,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.brix.Seller_Sync.client.Client;
+import com.brix.Seller_Sync.client.ClientProvider;
 import com.brix.Seller_Sync.client.ClientRepository;
 import com.brix.Seller_Sync.client.service.ClientService;
 import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.common.exception.ResourceNotFoundException;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
 import com.brix.Seller_Sync.common.utils.AppUtils;
+import com.brix.Seller_Sync.lwa.exception.LWAExceptionErrorCode;
 
 import lombok.extern.java.Log;
 
@@ -44,7 +46,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public List<Client> getAllSPClientsToken() {
-        List<Client> clients = clientRepository.findAllByProvider("SP");
+        List<Client> clients = clientRepository.findAllByProviderAndErrorIsNull(ClientProvider.SELLING_PARTNER_API);
 
 
         return clients;
@@ -96,6 +98,17 @@ public class ClientServiceImpl implements ClientService {
         Client updatedClient = clientRepository.save(existingClient);
 
         return new ResponseEntity<>(updatedClient, HttpStatus.OK);
+    }
+
+    @Override
+    public Client setErrors(Long id, LWAExceptionErrorCode error, String errorDescription) {
+        Client client = clientRepository.findById(id).orElseThrow(
+            () -> new ResourceNotFoundException("Client", AppConstants.ID, id));
+
+        client.setError(error);
+        client.setErrorDescription(errorDescription);
+
+        return clientRepository.save(client);
     }
 
     @Override
