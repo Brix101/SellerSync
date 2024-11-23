@@ -22,6 +22,7 @@ import com.brix.Seller_Sync.client.service.ClientService;
 import com.brix.Seller_Sync.marketplace.Marketplace;
 import com.brix.Seller_Sync.reportqueue.ReportQueue;
 import com.brix.Seller_Sync.reportqueue.ReportQueueService;
+import com.brix.Seller_Sync.salesandtraffic.service.SalesAndTrafficService;
 
 import lombok.extern.java.Log;
 
@@ -38,8 +39,11 @@ public class SaleAndTrafficScheduledTasks {
     @Autowired
     private ReportQueueService reportQueueService;
 
-    // @Scheduled(cron = "*/30 * * * * ?") // Every 30 seconds
-    @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
+    @Autowired
+    private SalesAndTrafficService salesAndTrafficService;
+
+    @Scheduled(cron = "*/30 * * * * ?") // Every 30 seconds
+    // @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
     private void createSaleAndTrafficReport() {
         log.info("Starting sale and traffic report cron job");
 
@@ -103,8 +107,11 @@ public class SaleAndTrafficScheduledTasks {
 
                     if (report.getReportDocumentId() != null){
                         ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
-    
-                        log.info(reportDocument.getUrl());
+                        
+                        // SalesAndTrafficReport salesAndTrafficReport = salesAndTrafficService.parseReportDocument(reportDocument);
+
+                        // log.info(salesAndTrafficReport.toString());
+
                         // TODO add parser for sales and traffic here
                     }
                 } catch (Exception e) {

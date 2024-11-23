@@ -14,7 +14,7 @@ import com.brix.Seller_Sync.amzn.payload.saleandtraffic.SalesAndTrafficReport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
-public class SalesAndTrafficServiceImpl implements SalesAndTrafficeService {
+public class SalesAndTrafficServiceImpl implements SalesAndTrafficService {
 
     @Override
     public SalesAndTrafficReport parseReportDocument(ReportDocument reportDocument) {
