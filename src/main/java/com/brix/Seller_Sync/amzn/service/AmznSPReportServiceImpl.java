@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.brix.Seller_Sync.amzn.payload.CreateReportResponse;
 import com.brix.Seller_Sync.amzn.payload.Report;
 import com.brix.Seller_Sync.amzn.payload.ReportDocument;
+import com.brix.Seller_Sync.amzn.payload.ReportResponse;
 import com.brix.Seller_Sync.amzn.payload.ReportSpecification;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.AppConstants;
@@ -32,13 +32,13 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
     private StringRedisTemplate redisTemplate;
 
     @Override
-    public CreateReportResponse createReport(Client client, ReportSpecification reportSpecification) {
+    public ReportResponse createReport(Client client, ReportSpecification reportSpecification) {
         String reportKey = client.getClientId() + ":" + reportSpecification.hashCode();
 
         String existingReportId = redisTemplate.opsForValue().get(reportKey);
         if (existingReportId != null) {
             log.info(reportSpecification.getReportType() + " Report already exists for client " + client.getClientId());
-            return new CreateReportResponse(existingReportId);
+            return new ReportResponse(existingReportId);
         }
 
         log.info("Creating " + reportSpecification.getReportType() + " report for client " + client.getClientId());
@@ -54,28 +54,28 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
         
         HttpEntity<ReportSpecification> request = new HttpEntity<>(reportSpecification, headers);
         
-        ResponseEntity<CreateReportResponse> response = restTemplate.exchange(
+        ResponseEntity<ReportResponse> response = restTemplate.exchange(
             url,
             HttpMethod.POST,
             request,
-            CreateReportResponse.class
+            ReportResponse.class
         );
 
-        CreateReportResponse createReportResponse = response.getBody();
+        ReportResponse reportResponse = response.getBody();
 
         log.info("Created " + reportSpecification.getReportType() + " report for client " + client.getClientId());
-        if (createReportResponse != null) {
-            redisTemplate.opsForValue().set(reportKey, createReportResponse.getReportId(), 3600, TimeUnit.SECONDS);
+        if (reportResponse != null) {
+            redisTemplate.opsForValue().set(reportKey, reportResponse.getReportId(), 3600, TimeUnit.SECONDS);
         }
 
-        return createReportResponse;
+        return reportResponse;
     }
 
     @Override
-    public Report getReport(Client client, CreateReportResponse createReportResponse) {
-        log.info("Getting report for reportId: " + createReportResponse.getReportId());
+    public Report getReport(Client client, ReportResponse reportResponse) {
+        log.info("Getting report for reportId: " + reportResponse.getReportId());
 
-        String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports/" + createReportResponse.getReportId();
+        String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports/" + reportResponse.getReportId();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 

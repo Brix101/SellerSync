@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.brix.Seller_Sync.amzn.payload.CreateReportResponse;
 import com.brix.Seller_Sync.amzn.payload.Report;
 import com.brix.Seller_Sync.amzn.payload.ReportDocument;
+import com.brix.Seller_Sync.amzn.payload.ReportResponse;
 import com.brix.Seller_Sync.amzn.payload.ReportSpecification;
 import com.brix.Seller_Sync.amzn.payload.ReportSpecification.ReportType;
 import com.brix.Seller_Sync.amzn.service.AmznSPReportService;
@@ -61,9 +61,9 @@ public class ListingScheduledTasks {
                 ReportQueue reportQueue = new ReportQueue(client, reportSpecification);
 
                 if (!reportQueueService.isReportInQueue(reportQueue)){
-                    CreateReportResponse createReportResponse = amznSPReportService.createReport(client, reportSpecification);
+                    ReportResponse reportResponse = amznSPReportService.createReport(client, reportSpecification);
 
-                    reportQueueService.enqueueReport(reportQueue, createReportResponse.getReportId());
+                    reportQueueService.enqueueReport(reportQueue, reportResponse.getReportId());
                 }
             } catch (Exception e) {
                 log.severe("Failed to create report for client: " + client.getClientId() + " due to: " + e.getMessage());
@@ -83,9 +83,9 @@ public class ListingScheduledTasks {
                     Client client = clientService.getClientByClientId(clientId);
                     String reportId = reportQueue.get(key);
 
-                    CreateReportResponse createReportResponse = new CreateReportResponse(reportId);
+                    ReportResponse reportResponse = new ReportResponse(reportId);
 
-                    Report report = amznSPReportService.getReport(client, createReportResponse);
+                    Report report = amznSPReportService.getReport(client, reportResponse);
 
                     if (report.getReportDocumentId() != null){
                         ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
