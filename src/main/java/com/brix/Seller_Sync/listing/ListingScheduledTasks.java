@@ -19,6 +19,8 @@ import com.brix.Seller_Sync.client.service.ClientService;
 import com.brix.Seller_Sync.listing.payload.CreateListingRequest;
 import com.brix.Seller_Sync.listing.service.ListingService;
 import com.brix.Seller_Sync.marketplace.Marketplace;
+import com.brix.Seller_Sync.reportqueue.ReportQueue;
+import com.brix.Seller_Sync.reportqueue.ReportQueueService;
 
 import lombok.extern.java.Log;
 
@@ -35,8 +37,11 @@ public class ListingScheduledTasks {
     @Autowired
     private ListingService listingService;
 
-    private static final ConcurrentHashMap<String, String> reportQueue = new ConcurrentHashMap<>();
+    @Autowired
+    private ReportQueueService reportQueueService;
 
+
+    // @Scheduled(cron = "*/30 * * * * ?") // Every 30 seconds
     @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
     public void createListingReport() {
         // TODO move this to a service with a filter for all the store clients
@@ -52,12 +57,13 @@ public class ListingScheduledTasks {
                 createReportSpecification.setReportType(ReportType.GET_MERCHANT_LISTINGS_ALL_DATA);
                 createReportSpecification.setMarketplaceIds(marketplaceIds);
 
-                CreateReportResponse createReportResponse = amznSPReportService.createReport(client, createReportSpecification);
 
-                String reportKey = client.getClientId() + ":" + createReportResponse.hashCode();
-                if (createReportResponse.getReportId() != null && !reportQueue.containsKey(reportKey)){
-                    log.info("Enqueueing report: " + createReportResponse.getReportId());
-                    enqueueReport(reportKey, createReportResponse.getReportId());
+                ReportQueue reportQueue = new ReportQueue(client, createReportSpecification);
+
+                if (!reportQueueService.isReportInQueue(reportQueue)){
+                    CreateReportResponse createReportResponse = amznSPReportService.createReport(client, createReportSpecification);
+
+                    reportQueueService.enqueueReport(reportQueue, createReportResponse.getReportId());
                 }
             } catch (Exception e) {
                 log.severe("Failed to create report for client: " + client.getClientId() + " due to: " + e.getMessage());
@@ -67,38 +73,37 @@ public class ListingScheduledTasks {
 
     @Scheduled(fixedDelay = 5000) // This cron expression means every 5 seconds
     public void getAllReports(){
+        ConcurrentHashMap<String, String> reportQueue = reportQueueService.getQueuedReports(ReportType.GET_MERCHANT_LISTINGS_ALL_DATA);
+
         if (!reportQueue.isEmpty()){
             for (String key : reportQueue.keySet()){
-                String clientId = key.split(":")[0];
-                Client client = clientService.getClientByClientId(clientId);
-                String reportId = reportQueue.get(key);
+                try {
 
-                CreateReportResponse createReportResponse = new CreateReportResponse(reportId);
+                    String clientId = reportQueueService.getClientIdFromKey(key);
+                    Client client = clientService.getClientByClientId(clientId);
+                    String reportId = reportQueue.get(key);
 
-                Report report = amznSPReportService.getReport(client, createReportResponse);
+                    CreateReportResponse createReportResponse = new CreateReportResponse(reportId);
 
-                if (report.getReportDocumentId() != null){
-                    ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
-                    List<CreateListingRequest> createListingRequests = listingService.parseListingDocument(reportDocument);
+                    Report report = amznSPReportService.getReport(client, createReportResponse);
 
-                    log.info("Update listings for client: " + client.getClientId());
-                    for (CreateListingRequest createListingRequest : createListingRequests){
-                        createListingRequest.setStoreId(client.getStore().getId());
-                        listingService.upsertListing(createListingRequest);
+                    if (report.getReportDocumentId() != null){
+                        ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
+                        List<CreateListingRequest> createListingRequests = listingService.parseListingDocument(reportDocument);
+
+                        log.info("Update listings for client: " + client.getClientId());
+                        for (CreateListingRequest createListingRequest : createListingRequests){
+                            createListingRequest.setStoreId(client.getStore().getId());
+                            listingService.upsertListing(createListingRequest);
+                        }
+                        
                     }
-                    
-                    dequeueReport(key);
+                } catch (Exception e) {
+                    log.info("Failed to get report for key: " + key + " due to: " + e.getMessage());
+                } finally {
+                    reportQueueService.dequeueReport(key);
                 }
             }
         }
     }
-
-    private void enqueueReport(String key, String reportId){
-        reportQueue.put(key, reportId);
-    }
-
-    private void dequeueReport(String key){
-        reportQueue.remove(key);
-    }
-
 }
