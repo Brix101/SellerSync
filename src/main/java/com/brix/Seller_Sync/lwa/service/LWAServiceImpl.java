@@ -13,8 +13,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import com.brix.Seller_Sync.client.Client;
+import com.brix.Seller_Sync.client.service.ClientService;
 import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.lwa.exception.LWAException;
+import com.brix.Seller_Sync.lwa.exception.LWAExceptionErrorCode;
 import com.brix.Seller_Sync.lwa.payload.LWAAccessTokenRequestMeta;
 import com.brix.Seller_Sync.lwa.payload.LWATokenResponse;
 
@@ -26,6 +28,9 @@ public class LWAServiceImpl implements LWAService {
    
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private ClientService clientService;
 
 
     private LWATokenResponse refreshAccessToken(Client client) throws LWAException {
@@ -44,10 +49,21 @@ public class LWAServiceImpl implements LWAService {
             
             return response.getBody();
             
-        }  catch (HttpClientErrorException.BadRequest e) {
+        } catch (HttpClientErrorException e) {
             LWATokenResponse responseBody = e.getResponseBodyAs(LWATokenResponse.class);
-            
-            throw new LWAException(responseBody.getError(), responseBody.getErrorDescription(), "Error getting LWA Token");
+            if (responseBody != null) {
+                String error = responseBody.getError();
+                String errorDescription = responseBody.getErrorDescription();
+                throw new LWAException(error, errorDescription, "Error getting LWA Token");
+            } else {
+                if (e instanceof HttpClientErrorException.BadRequest) {
+                    throw new LWAException("BadRequest", "No response body", "Error getting LWA Token");
+                } else if (e instanceof HttpClientErrorException.Unauthorized) {
+                    throw new LWAException("invalid_client", "Client authentication failed");
+                }else{
+                    throw new LWAException(LWAExceptionErrorCode.other.toString(), "Other LWA Exception","Error getting LWA Token");
+                }
+            }
         } catch (Exception e) {
             throw new RuntimeException("Something went wrong while refreshing the access token", e);
         }
@@ -69,8 +85,16 @@ public class LWAServiceImpl implements LWAService {
                 addAccessToken(client.getClientId(), newToken);
 
                 accessToken = newToken.getAccessToken();
+            } catch (LWAException e) {
+                
+                LWAExceptionErrorCode errorCode = LWAExceptionErrorCode.valueOf(e.getErrorCode());
+
+                clientService.setErrors(client.getId(), errorCode, e.getErrorMessage());
+                log.severe(e.getErrorMessage() + " for client: " + client.getClientId());
             } catch (Exception e) {
-                e.printStackTrace();
+                clientService.setErrors(client.getId(), LWAExceptionErrorCode.other, e.getMessage());
+
+                log.severe("Error getting access token for client: " + client.getClientId());
             }
         }
         return accessToken;

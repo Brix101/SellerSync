@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.lwa;
+package com.brix.Seller_Sync.lwa.exception;
 
 public enum LWAExceptionErrorCode {
     access_denied,
@@ -6,6 +6,7 @@ public enum LWAExceptionErrorCode {
     invalid_request,
     invalid_scope,
     server_error,
+    unsupported_grant_type,
     temporarily_unavailable,
     unauthorized_client,
     invalid_client,

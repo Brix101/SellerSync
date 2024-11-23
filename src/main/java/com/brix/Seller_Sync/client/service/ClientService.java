@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.payload.PagedResponse;
+import com.brix.Seller_Sync.lwa.exception.LWAExceptionErrorCode;
 
 public interface ClientService {
 
@@ -22,6 +23,8 @@ public interface ClientService {
     ResponseEntity<Client> addClient(Client client);
 
     ResponseEntity<Client> updateClient(Long id, Client client);
+
+    Client setErrors(Long id, LWAExceptionErrorCode error, String errorDescription);
 
     ResponseEntity<Client> deleteClient(Long id);
 }

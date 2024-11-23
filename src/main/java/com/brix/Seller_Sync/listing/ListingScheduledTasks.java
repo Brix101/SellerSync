@@ -43,19 +43,23 @@ public class ListingScheduledTasks {
         List<Client> clients = clientService.getAllSPClientsToken();
 
         for (Client client : clients){
-            List<Marketplace> marketplaces = client.getStore().getMarketplaces();
+            try {
+                List<Marketplace> marketplaces = client.getStore().getMarketplaces();
 
-            List<String> marketplaceIds = marketplaces.stream().map(Marketplace::getMarketplaceId).collect(Collectors.toList());
+                List<String> marketplaceIds = marketplaces.stream().map(Marketplace::getMarketplaceId).collect(Collectors.toList());
 
-            CreateReportSpecification createReportSpecification = new CreateReportSpecification();
-            createReportSpecification.setReportType(ReportType.GET_MERCHANT_LISTINGS_ALL_DATA);
-            createReportSpecification.setMarketplaceIds(marketplaceIds);
+                CreateReportSpecification createReportSpecification = new CreateReportSpecification();
+                createReportSpecification.setReportType(ReportType.GET_MERCHANT_LISTINGS_ALL_DATA);
+                createReportSpecification.setMarketplaceIds(marketplaceIds);
 
-            CreateReportResponse createReportResponse = amznSPReportService.createReport(client, createReportSpecification);
+                CreateReportResponse createReportResponse = amznSPReportService.createReport(client, createReportSpecification);
 
-            String reportKey = client.getClientId() + ":" + createReportResponse.hashCode();
-            if (createReportResponse.getReportId() != null && !reportQueue.containsKey(reportKey)){
-                enqueueReport(reportKey, createReportResponse.getReportId());
+                String reportKey = client.getClientId() + ":" + createReportResponse.hashCode();
+                if (createReportResponse.getReportId() != null && !reportQueue.containsKey(reportKey)){
+                    enqueueReport(reportKey, createReportResponse.getReportId());
+                }
+            } catch (Exception e) {
+                log.severe("Failed to create report for client: " + client.getClientId() + " due to: " + e.getMessage());
             }
         }
     }

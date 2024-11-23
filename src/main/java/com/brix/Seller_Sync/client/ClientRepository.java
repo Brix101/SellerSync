@@ -13,7 +13,9 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     List<Client> findAllByStoreId(Long storeId);
 
-    List<Client> findAllByProvider(String provider);
+    List<Client> findAllByProvider(ClientProvider provider);
+
+    List<Client> findAllByProviderAndErrorIsNull(ClientProvider provider);
 
     Optional<Client> findByClientId(String clientId);
 }
