@@ -1,8 +1,9 @@
-package com.brix.Seller_Sync.product.service;
+package com.brix.Seller_Sync.listing.service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,15 +12,31 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.brix.Seller_Sync.amzn.payload.ReportDocument;
-import com.brix.Seller_Sync.product.Listing;
+import com.brix.Seller_Sync.listing.Listing;
+import com.brix.Seller_Sync.listing.ListingRepository;
+import com.brix.Seller_Sync.listing.payload.CreateListingRequest;
 
 import lombok.extern.java.Log;
 
 @Service
 @Log
-public class ListingService {
+public class ListingServiceImpl implements ListingService {
+    
+    @Autowired
+    private ListingRepository listingRepository;
 
-    public List<Listing> parseListingDocument(ReportDocument reportDocument) {
+    @Override
+    public Listing addListing(Listing Listing) {
+        return listingRepository.save(Listing);
+    }
+
+    @Override
+    public Listing upsertListing(CreateListingRequest createListingRequest) {
+        return listingRepository.upsertByAsin(createListingRequest.getSellerSku(), createListingRequest.getAsin(), createListingRequest.getStatus(), createListingRequest.getStoreId());
+    }
+
+    @Override
+    public List<CreateListingRequest> parseListingDocument(ReportDocument reportDocument) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 
@@ -30,7 +47,7 @@ public class ListingService {
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
 
-            List<Listing> listings = new ArrayList<>();
+            List<CreateListingRequest> createListingRequests = new ArrayList<>();
 
             String data = response.getBody();
             if (data != null) {
@@ -44,12 +61,12 @@ public class ListingService {
                         String status = columns[28];
 
                         if (!asin.isEmpty()) {
-                            listings.add(new Listing(sellerSku, asin, status, 0L));
+                            createListingRequests.add(new CreateListingRequest(sellerSku, asin, status, 0L));
                         }
                     }
                 }
             }
-            return listings;
+            return createListingRequests;
         } catch (Exception e) {
             log.info(e.getMessage());
             return new ArrayList<>();

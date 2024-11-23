@@ -6,8 +6,8 @@ import java.util.List;
 import com.brix.Seller_Sync.brand.Brand;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.entity.BaseEntity;
+import com.brix.Seller_Sync.listing.Listing;
 import com.brix.Seller_Sync.marketplace.Marketplace;
-import com.brix.Seller_Sync.product.Product;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -48,7 +48,7 @@ public class Store extends BaseEntity {
 
     @JsonIgnore
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Product> products = new ArrayList<>();
+    private List<Listing> listings = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

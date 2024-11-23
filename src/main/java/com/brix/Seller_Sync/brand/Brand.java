@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.brix.Seller_Sync.common.entity.BaseEntity;
-import com.brix.Seller_Sync.product.Product;
+import com.brix.Seller_Sync.listing.Listing;
 import com.brix.Seller_Sync.store.Store;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -38,5 +38,5 @@ public class Brand extends BaseEntity {
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Product> products = new ArrayList<>();
+    private List<Listing> listings = new ArrayList<>();
 }
