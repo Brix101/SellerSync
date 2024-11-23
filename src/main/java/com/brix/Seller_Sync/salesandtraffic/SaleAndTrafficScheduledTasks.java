@@ -12,10 +12,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.brix.Seller_Sync.amzn.payload.CreateReportResponse;
-import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification;
-import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification.ReportType;
 import com.brix.Seller_Sync.amzn.payload.Report;
 import com.brix.Seller_Sync.amzn.payload.ReportDocument;
+import com.brix.Seller_Sync.amzn.payload.ReportSpecification;
+import com.brix.Seller_Sync.amzn.payload.ReportSpecification.ReportType;
 import com.brix.Seller_Sync.amzn.service.AmznSPReportService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.service.ClientService;
@@ -60,20 +60,20 @@ public class SaleAndTrafficScheduledTasks {
             try {
                 List<Marketplace> marketplaces = client.getStore().getMarketplaces();
 
-                CreateReportSpecification createReportSpecification = new CreateReportSpecification();
-                createReportSpecification.setReportType(ReportType.GET_SALES_AND_TRAFFIC_REPORT);
-                createReportSpecification.setReportOptions(reportOption);
-                createReportSpecification.setDataStartTime(dataStartTime);
-                createReportSpecification.setDataEndTime(dataStartTime);
+                ReportSpecification reportSpecification = new ReportSpecification();
+                reportSpecification.setReportType(ReportType.GET_SALES_AND_TRAFFIC_REPORT);
+                reportSpecification.setReportOptions(reportOption);
+                reportSpecification.setDataStartTime(dataStartTime);
+                reportSpecification.setDataEndTime(dataStartTime);
 
                 for (Marketplace marketplace : marketplaces){
-                    createReportSpecification.setMarketplaceIds(List.of(marketplace.getMarketplaceId()));
+                    reportSpecification.setMarketplaceIds(List.of(marketplace.getMarketplaceId()));
 
-                    ReportQueue reportQueue = new ReportQueue(client, createReportSpecification);
+                    ReportQueue reportQueue = new ReportQueue(client, reportSpecification);
 
 
                     if (!reportQueueService.isReportInQueue(reportQueue)){
-                        CreateReportResponse createReportResponse = amznSPReportService.createReport(client, createReportSpecification);
+                        CreateReportResponse createReportResponse = amznSPReportService.createReport(client, reportSpecification);
 
                         reportQueueService.enqueueReport(reportQueue, createReportResponse.getReportId());
                     }

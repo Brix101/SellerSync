@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
-import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification.ReportType;
+import com.brix.Seller_Sync.amzn.payload.ReportSpecification.ReportType;
 
 import lombok.extern.java.Log;
 

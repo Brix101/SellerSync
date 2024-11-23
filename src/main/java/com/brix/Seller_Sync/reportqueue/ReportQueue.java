@@ -1,8 +1,8 @@
 
 package com.brix.Seller_Sync.reportqueue;
 
-import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification;
-import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification.ReportType;
+import com.brix.Seller_Sync.amzn.payload.ReportSpecification;
+import com.brix.Seller_Sync.amzn.payload.ReportSpecification.ReportType;
 import com.brix.Seller_Sync.client.Client;
 
 import lombok.AllArgsConstructor;
@@ -20,11 +20,11 @@ public class ReportQueue {
     private Client client;
 
     @NonNull
-    private CreateReportSpecification createReportSpecification;
+    private ReportSpecification reportSpecification;
 
     public String getReportKey(){
-        ReportType reportType = createReportSpecification.getReportType();
+        ReportType reportType = reportSpecification.getReportType();
 
-        return reportType.toString() + ":" + client.getClientId() + ":" + createReportSpecification.hashCode();
+        return reportType.toString() + ":" + client.getClientId() + ":" + reportSpecification.hashCode();
     }
 }

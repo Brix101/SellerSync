@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.brix.Seller_Sync.amzn.payload.CreateReportResponse;
-import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification;
 import com.brix.Seller_Sync.amzn.payload.Report;
 import com.brix.Seller_Sync.amzn.payload.ReportDocument;
+import com.brix.Seller_Sync.amzn.payload.ReportSpecification;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.AppConstants;
 import com.brix.Seller_Sync.lwa.service.LWAService;
@@ -32,16 +32,16 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
     private StringRedisTemplate redisTemplate;
 
     @Override
-    public CreateReportResponse createReport(Client client, CreateReportSpecification createReportSpecification) {
-        String reportKey = client.getClientId() + ":" + createReportSpecification.hashCode();
+    public CreateReportResponse createReport(Client client, ReportSpecification reportSpecification) {
+        String reportKey = client.getClientId() + ":" + reportSpecification.hashCode();
 
         String existingReportId = redisTemplate.opsForValue().get(reportKey);
         if (existingReportId != null) {
-            log.info(createReportSpecification.getReportType() + " Report already exists for client " + client.getClientId());
+            log.info(reportSpecification.getReportType() + " Report already exists for client " + client.getClientId());
             return new CreateReportResponse(existingReportId);
         }
 
-        log.info("Creating " + createReportSpecification.getReportType() + " report for client " + client.getClientId());
+        log.info("Creating " + reportSpecification.getReportType() + " report for client " + client.getClientId());
 
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports";
         RestTemplate restTemplate = new RestTemplate();
@@ -52,7 +52,7 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
         headers.set("Content-Type", "application/json");
         headers.set("x-amz-access-token", accessToken);
         
-        HttpEntity<CreateReportSpecification> request = new HttpEntity<>(createReportSpecification, headers);
+        HttpEntity<ReportSpecification> request = new HttpEntity<>(reportSpecification, headers);
         
         ResponseEntity<CreateReportResponse> response = restTemplate.exchange(
             url,
@@ -63,7 +63,7 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
         CreateReportResponse createReportResponse = response.getBody();
 
-        log.info("Created " + createReportSpecification.getReportType() + " report for client " + client.getClientId());
+        log.info("Created " + reportSpecification.getReportType() + " report for client " + client.getClientId());
         if (createReportResponse != null) {
             redisTemplate.opsForValue().set(reportKey, createReportResponse.getReportId(), 3600, TimeUnit.SECONDS);
         }
