@@ -91,8 +91,11 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
             request,
             Report.class
         );
-        
-        return response.getBody();
+
+        Report report = response.getBody();
+
+        log.info("Status for reportId: " + report.getReportId() + " is " + report.getProcessingStatus());
+        return report;
     }
 
 
@@ -116,7 +119,10 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
             request,
             ReportDocument.class
         );
+
+        ReportDocument reportDocument = response.getBody();
         
-        return response.getBody();
+        log.info("Report document received for reportId: " + report.getReportId());
+        return reportDocument;
     }
 }
