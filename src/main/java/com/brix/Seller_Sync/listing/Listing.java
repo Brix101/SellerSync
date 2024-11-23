@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.product;
+package com.brix.Seller_Sync.listing;
 
 import com.brix.Seller_Sync.brand.Brand;
 import com.brix.Seller_Sync.common.entity.BaseEntity;
@@ -21,8 +21,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "product", uniqueConstraints = {@UniqueConstraint(columnNames = "asin")})
-public class Product extends BaseEntity {
+@Table(name = "listing", uniqueConstraints = {@UniqueConstraint(columnNames = "asin")})
+public class Listing extends BaseEntity {
 
     @Column(nullable = false)
     private String sellerSKU;

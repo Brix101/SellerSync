@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.product;
+package com.brix.Seller_Sync.listing;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,15 +16,15 @@ import com.brix.Seller_Sync.amzn.payload.ReportDocument;
 import com.brix.Seller_Sync.amzn.service.AmznSPReportService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.service.ClientService;
+import com.brix.Seller_Sync.listing.payload.CreateListingRequest;
+import com.brix.Seller_Sync.listing.service.ListingService;
 import com.brix.Seller_Sync.marketplace.Marketplace;
-import com.brix.Seller_Sync.product.service.ListingService;
-import com.brix.Seller_Sync.product.service.ProductService;
 
 import lombok.extern.java.Log;
 
 @Component
 @Log
-public class ProductScheduledTasks {
+public class ListingScheduledTasks {
 
     @Autowired
     private ClientService clientService;
@@ -34,9 +34,6 @@ public class ProductScheduledTasks {
 
     @Autowired
     private ListingService listingService;
-
-    @Autowired
-    private ProductService productService;
 
     private static final ConcurrentHashMap<String, String> reportQueue = new ConcurrentHashMap<>();
 
@@ -77,12 +74,12 @@ public class ProductScheduledTasks {
 
                 if (report.getReportDocumentId() != null){
                     ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
-                    List<Listing> listings = listingService.parseListingDocument(reportDocument);
+                    List<CreateListingRequest> createListingRequests = listingService.parseListingDocument(reportDocument);
 
                     log.info("Update listings for client: " + client.getClientId());
-                    for (Listing listing : listings){
-                        listing.setStoreId(client.getStore().getId());
-                        productService.upsertListing(listing);
+                    for (CreateListingRequest createListingRequest : createListingRequests){
+                        createListingRequest.setStoreId(client.getStore().getId());
+                        listingService.upsertListing(createListingRequest);
                     }
                     
                     dequeueReport(key);
