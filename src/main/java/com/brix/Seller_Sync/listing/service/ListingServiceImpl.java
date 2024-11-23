@@ -36,7 +36,7 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
-    public List<CreateListingRequest> parseListingDocument(ReportDocument reportDocument) {
+    public List<CreateListingRequest> parseReportDocument(ReportDocument reportDocument) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 
