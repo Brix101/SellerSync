@@ -19,11 +19,14 @@ public class CreateReportSpecification {
         GET_SALES_AND_TRAFFIC_REPORT
     }
 
-    private Map<String, String> reportOptions; // Optional reportOptions
     @NonNull
     private ReportType reportType; // Change type to enum
-    private String dataStartTime; // Optional dataStartTime
-    private String dataEndTime; // Optional dataEndTime
+
+    private Map<String, String> reportOptions; // Optional reportOptions
+
     @NonNull
     private List<String> marketplaceIds; // Required marketplaceIds
+    
+    private String dataStartTime; // Optional dataStartTime
+    private String dataEndTime; // Optional dataEndTime
 }

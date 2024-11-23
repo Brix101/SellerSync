@@ -63,11 +63,11 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
         CreateReportResponse createReportResponse = response.getBody();
 
+        log.info("Created " + createReportSpecification.getReportType() + " report for client " + client.getClientId());
         if (createReportResponse != null) {
             redisTemplate.opsForValue().set(reportKey, createReportResponse.getReportId(), 3600, TimeUnit.SECONDS);
         }
 
-        log.info("Report created for client: " + client.getClientId() + " with reportId: " + createReportResponse.getReportId());
         return createReportResponse;
     }
 

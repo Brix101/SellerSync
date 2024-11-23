@@ -56,6 +56,7 @@ public class ListingScheduledTasks {
 
                 String reportKey = client.getClientId() + ":" + createReportResponse.hashCode();
                 if (createReportResponse.getReportId() != null && !reportQueue.containsKey(reportKey)){
+                    log.info("Enqueueing report: " + createReportResponse.getReportId());
                     enqueueReport(reportKey, createReportResponse.getReportId());
                 }
             } catch (Exception e) {
