@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.salesandtraffic;
+package com.brix.Seller_Sync.sale;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -24,13 +24,13 @@ import com.brix.Seller_Sync.client.service.ClientService;
 import com.brix.Seller_Sync.marketplace.Marketplace;
 import com.brix.Seller_Sync.reportqueue.ReportQueue;
 import com.brix.Seller_Sync.reportqueue.ReportQueueService;
-import com.brix.Seller_Sync.salesandtraffic.service.SalesAndTrafficService;
+import com.brix.Seller_Sync.sale.service.SaleService;
 
 import lombok.extern.java.Log;
 
 @Component
 @Log
-public class SaleAndTrafficScheduledTasks {
+public class SaleScheduledTasks {
 
     @Autowired
     private ClientService clientService;
@@ -42,9 +42,9 @@ public class SaleAndTrafficScheduledTasks {
     private ReportQueueService reportQueueService;
 
     @Autowired
-    private SalesAndTrafficService salesAndTrafficService;
+    private SaleService salesAndTrafficService;
 
-    // @Scheduled(cron = "*/30 * * * * ?") // Every 30 seconds
+    // @Scheduled(cron = "5 * * * * ?") // Every 30 seconds
     @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
     private void createSaleAndTrafficReport() {
         log.info("Starting sale and traffic report cron job");
@@ -98,7 +98,7 @@ public class SaleAndTrafficScheduledTasks {
         if (!reportQueue.isEmpty()){
             for (String key : reportQueue.keySet()){
                 try {
-
+                    log.info("Getting report for key: " + key);
                     String clientId = reportQueueService.getClientIdFromKey(key);
                     Client client = clientService.getClientByClientId(clientId);
                     String reportId = reportQueue.get(key);
@@ -109,7 +109,6 @@ public class SaleAndTrafficScheduledTasks {
 
                     if (report.getReportDocumentId() != null){
                         ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
-                        log.info(reportDocument.getUrl());
                         SalesAndTrafficReport salesAndTrafficReport = salesAndTrafficService.parseReportDocument(reportDocument);
 
                         List<SalesAndTrafficByAsin> salesAndTrafficByAsins = salesAndTrafficReport.getSalesAndTrafficByAsin();
