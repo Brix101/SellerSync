@@ -9,6 +9,7 @@ import com.brix.Seller_Sync.common.entity.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -27,28 +28,47 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "sale", uniqueConstraints = { @UniqueConstraint(columnNames = { "client_id", "date" }) })
+@Table(name = "sale", uniqueConstraints = { @UniqueConstraint(columnNames = { "client_id", "date", "currencyCode" }) })
 public class Sale extends BaseEntity {
+
+    @NotNull
+    private LocalDate date;
+
+    @Column()
+    @NotNull
+    private String currencyCode;
+
+    @Column()
+    private Integer unitsOrdered;
+
+    @Column()
+    private Integer totalOrderItems;
+
+    @Column()
+    private Integer unitsRefunded;
+
+    @Column()
+    private Double refundRate;
+
+    @Column()
+    private Integer unitsShipped;
+
+    @Column()
+    private Integer ordersShipped;
+   
+    @Column()
+    private Double orderedProductSalesAmount;
+   
+    @Column()
+    private Double averageSalesPerOrderItem;
+   
+    @Column()
+    private Double shippedProductSales;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
-
-    @NotNull
-    private LocalDate date;
-
-    private Integer unitsOrdered;
-    private Integer totalOrderItems;
-    private Integer unitsRefunded;
-    private Double refundRate;
-    private Integer unitsShipped;
-    private Integer ordersShipped;
-
-    private String currencyCode;
-    private Double orderedProductSalesAmount;
-    private Double averageSalesPerOrderItem;
-    private Double shippedProductSales;
 
     @JsonIgnore
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
