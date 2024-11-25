@@ -16,7 +16,6 @@ import com.brix.Seller_Sync.amzn.payload.ReportDocument;
 import com.brix.Seller_Sync.amzn.payload.ReportResponse;
 import com.brix.Seller_Sync.amzn.payload.ReportSpecification;
 import com.brix.Seller_Sync.amzn.payload.ReportSpecification.ReportType;
-import com.brix.Seller_Sync.amzn.payload.saleandtraffic.SalesAndTrafficByAsin;
 import com.brix.Seller_Sync.amzn.payload.saleandtraffic.SalesAndTrafficReport;
 import com.brix.Seller_Sync.amzn.service.AmznSPReportService;
 import com.brix.Seller_Sync.client.Client;
@@ -42,7 +41,8 @@ public class SaleScheduledTasks {
     private ReportQueueService reportQueueService;
 
     @Autowired
-    private SaleService salesAndTrafficService;
+    private SaleService saleService;
+
 
     // @Scheduled(cron = "5 * * * * ?") // Every 30 seconds
     @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
@@ -98,7 +98,6 @@ public class SaleScheduledTasks {
         if (!reportQueue.isEmpty()){
             for (String key : reportQueue.keySet()){
                 try {
-                    log.info("Getting report for key: " + key);
                     String clientId = reportQueueService.getClientIdFromKey(key);
                     Client client = clientService.getClientByClientId(clientId);
                     String reportId = reportQueue.get(key);
@@ -109,13 +108,11 @@ public class SaleScheduledTasks {
 
                     if (report.getReportDocumentId() != null){
                         ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
-                        SalesAndTrafficReport salesAndTrafficReport = salesAndTrafficService.parseReportDocument(reportDocument);
+                        SalesAndTrafficReport salesAndTrafficReport = saleService.parseReportDocument(reportDocument);
 
-                        List<SalesAndTrafficByAsin> salesAndTrafficByAsins = salesAndTrafficReport.getSalesAndTrafficByAsin();
+                        Sale sale = saleService.saveSalesReport(client, salesAndTrafficReport);
 
-                        for (SalesAndTrafficByAsin salesAndTrafficByAsin : salesAndTrafficByAsins){
-                            log.info(salesAndTrafficByAsin.toString());
-                        }
+                        log.info("Total items saved: " + sale.getAsinSales().size());
                     }
                 } catch (Exception e) {
                     log.info("Failed to get report for key: " + key + " due to: " + e.getMessage());
