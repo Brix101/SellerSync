@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SalesAndTrafficByAsin {
     private String parentAsin;
-    private String chiildAsin;
+    private String childAsin;
     private String sku;
     private SalesByAsin salesByAsin;
+    private TrafficByAsin trafficByAsin;
 }

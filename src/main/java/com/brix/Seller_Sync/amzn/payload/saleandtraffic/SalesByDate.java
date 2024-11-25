@@ -12,16 +12,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SalesByDate {
     private Money orderedProductSales;
-    private int unitsOrdered;
-    private int totalOrderItems;
+    private Money orderedProductSalesB2B;
+    private Integer unitsOrdered;
+    private Integer unitsOrderedB2B;
+    private Integer totalOrderItems;
+    private Integer totalOrderItemsB2B;
     private Money averageSalesPerOrderItem;
-    private int averageUnitsPerOrderItem;
+    private Money averageSalesPerOrderItemB2B;
+    private Double averageUnitsPerOrderItem;
+    private Double averageUnitsPerOrderItemB2B;
     private Money averageSellingPrice;
-    private int unitsRefunded;
-    private double refundRate;
-    private int claimsGranted;
+    private Money averageSellingPriceB2B;
+    private Integer unitsRefunded;
+    private Double refundRate;
+    private Integer claimsGranted;
     private Money claimsAmount;
     private Money shippedProductSales;
-    private int unitsShipped;
-    private int ordersShipped;
+    private Integer unitsShipped;
+    private Integer ordersShipped;
 }
