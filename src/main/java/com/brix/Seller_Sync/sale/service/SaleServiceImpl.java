@@ -1,4 +1,4 @@
-package com.brix.Seller_Sync.salesandtraffic.service;
+package com.brix.Seller_Sync.sale.service;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -17,7 +17,7 @@ import com.brix.Seller_Sync.amzn.payload.saleandtraffic.SalesAndTrafficReport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
-public class SalesAndTrafficServiceImpl implements SalesAndTrafficService {
+public class SaleServiceImpl implements SaleService {
 
     @Override
     public SalesAndTrafficReport parseReportDocument(ReportDocument reportDocument) {
