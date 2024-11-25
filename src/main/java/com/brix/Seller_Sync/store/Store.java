@@ -36,7 +36,7 @@ public class Store extends BaseEntity {
     private String name;
 
     @Column()
-    private Boolean active = true;
+    private Boolean isActive = true;
 
     @JsonIgnore
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
