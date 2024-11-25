@@ -12,5 +12,5 @@ public interface ListingService {
 
     Listing upsertListing(CreateListingRequest createListingRequest);
 
-    List<CreateListingRequest> parseListingDocument(ReportDocument reportDocument);
+    List<CreateListingRequest> parseReportDocument(ReportDocument reportDocument);
 }

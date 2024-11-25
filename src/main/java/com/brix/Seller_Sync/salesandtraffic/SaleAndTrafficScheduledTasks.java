@@ -11,17 +11,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.brix.Seller_Sync.amzn.payload.CreateReportResponse;
-import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification;
-import com.brix.Seller_Sync.amzn.payload.CreateReportSpecification.ReportType;
 import com.brix.Seller_Sync.amzn.payload.Report;
 import com.brix.Seller_Sync.amzn.payload.ReportDocument;
+import com.brix.Seller_Sync.amzn.payload.ReportResponse;
+import com.brix.Seller_Sync.amzn.payload.ReportSpecification;
+import com.brix.Seller_Sync.amzn.payload.ReportSpecification.ReportType;
+import com.brix.Seller_Sync.amzn.payload.saleandtraffic.SalesAndTrafficByAsin;
+import com.brix.Seller_Sync.amzn.payload.saleandtraffic.SalesAndTrafficReport;
 import com.brix.Seller_Sync.amzn.service.AmznSPReportService;
 import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.service.ClientService;
 import com.brix.Seller_Sync.marketplace.Marketplace;
 import com.brix.Seller_Sync.reportqueue.ReportQueue;
 import com.brix.Seller_Sync.reportqueue.ReportQueueService;
+import com.brix.Seller_Sync.salesandtraffic.service.SalesAndTrafficService;
 
 import lombok.extern.java.Log;
 
@@ -38,6 +41,9 @@ public class SaleAndTrafficScheduledTasks {
     @Autowired
     private ReportQueueService reportQueueService;
 
+    @Autowired
+    private SalesAndTrafficService salesAndTrafficService;
+
     // @Scheduled(cron = "*/30 * * * * ?") // Every 30 seconds
     @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
     private void createSaleAndTrafficReport() {
@@ -52,7 +58,7 @@ public class SaleAndTrafficScheduledTasks {
 
         // Calculate the date range (current date minus 2 days)
         LocalDate now = LocalDate.now();
-        LocalDate twoDaysAgo = now.minusDays(2);
+        LocalDate twoDaysAgo = now.minusDays(3);
         DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
         String dataStartTime = twoDaysAgo.format(formatter);
 
@@ -60,22 +66,22 @@ public class SaleAndTrafficScheduledTasks {
             try {
                 List<Marketplace> marketplaces = client.getStore().getMarketplaces();
 
-                CreateReportSpecification createReportSpecification = new CreateReportSpecification();
-                createReportSpecification.setReportType(ReportType.GET_SALES_AND_TRAFFIC_REPORT);
-                createReportSpecification.setReportOptions(reportOption);
-                createReportSpecification.setDataStartTime(dataStartTime);
-                createReportSpecification.setDataEndTime(dataStartTime);
+                ReportSpecification reportSpecification = new ReportSpecification();
+                reportSpecification.setReportType(ReportType.GET_SALES_AND_TRAFFIC_REPORT);
+                reportSpecification.setReportOptions(reportOption);
+                reportSpecification.setDataStartTime(dataStartTime);
+                reportSpecification.setDataEndTime(dataStartTime);
 
                 for (Marketplace marketplace : marketplaces){
-                    createReportSpecification.setMarketplaceIds(List.of(marketplace.getMarketplaceId()));
+                    reportSpecification.setMarketplaceIds(List.of(marketplace.getMarketplaceId()));
 
-                    ReportQueue reportQueue = new ReportQueue(client, createReportSpecification);
+                    ReportQueue reportQueue = new ReportQueue(client, reportSpecification);
 
 
                     if (!reportQueueService.isReportInQueue(reportQueue)){
-                        CreateReportResponse createReportResponse = amznSPReportService.createReport(client, createReportSpecification);
+                        ReportResponse reportResponse = amznSPReportService.createReport(client, reportSpecification);
 
-                        reportQueueService.enqueueReport(reportQueue, createReportResponse.getReportId());
+                        reportQueueService.enqueueReport(reportQueue, reportResponse.getReportId());
                     }
                 }
             } catch (Exception e) {
@@ -97,15 +103,20 @@ public class SaleAndTrafficScheduledTasks {
                     Client client = clientService.getClientByClientId(clientId);
                     String reportId = reportQueue.get(key);
 
-                    CreateReportResponse createReportResponse = new CreateReportResponse(reportId);
+                    ReportResponse reportResponse = new ReportResponse(reportId);
 
-                    Report report = amznSPReportService.getReport(client, createReportResponse);
+                    Report report = amznSPReportService.getReport(client, reportResponse);
 
                     if (report.getReportDocumentId() != null){
                         ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
-    
                         log.info(reportDocument.getUrl());
-                        // TODO add parser for sales and traffic here
+                        SalesAndTrafficReport salesAndTrafficReport = salesAndTrafficService.parseReportDocument(reportDocument);
+
+                        List<SalesAndTrafficByAsin> salesAndTrafficByAsins = salesAndTrafficReport.getSalesAndTrafficByAsin();
+
+                        for (SalesAndTrafficByAsin salesAndTrafficByAsin : salesAndTrafficByAsins){
+                            log.info(salesAndTrafficByAsin.toString());
+                        }
                     }
                 } catch (Exception e) {
                     log.info("Failed to get report for key: " + key + " due to: " + e.getMessage());

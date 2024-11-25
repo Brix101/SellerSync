@@ -11,7 +11,7 @@ import lombok.NonNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateReportSpecification {
+public class ReportSpecification {
 
     public enum ReportType {
         GET_AMAZON_FULFILLED_SHIPMENTS_DATA_GENERAL,

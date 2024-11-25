@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateReportResponse {
-
-    private String reportId;
-
+public class Money {
+    private double amount;
+    private String currencyCode;
 }

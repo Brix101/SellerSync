@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -36,20 +32,15 @@ public class ListingServiceImpl implements ListingService {
     }
 
     @Override
-    public List<CreateListingRequest> parseListingDocument(ReportDocument reportDocument) {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-
-        HttpEntity<?> request = new HttpEntity<>(headers);
-
+    public List<CreateListingRequest> parseReportDocument(ReportDocument reportDocument) {
         try {
             String url = reportDocument.getDecodedUrl();
 
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
+            RestTemplate restTemplate = new RestTemplate();
+            String data = restTemplate.getForObject(url, String.class);
 
             List<CreateListingRequest> createListingRequests = new ArrayList<>();
 
-            String data = response.getBody();
             if (data != null) {
                 String[] lines = data.split("\n");
                 for (int i = 1; i < lines.length; i++) {
