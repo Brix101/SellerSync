@@ -9,6 +9,7 @@ import com.brix.Seller_Sync.common.entity.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -25,7 +26,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Sale", uniqueConstraints = { @UniqueConstraint(columnNames = { "client_id", "date" }) })
+@Entity
+@Table(name = "sale", uniqueConstraints = { @UniqueConstraint(columnNames = { "client_id", "date" }) })
 public class Sale extends BaseEntity {
 
     @JsonIgnore

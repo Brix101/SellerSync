@@ -3,9 +3,9 @@ package com.brix.Seller_Sync.sale;
 import com.brix.Seller_Sync.common.entity.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +15,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "AsinSale")
+// @Table(name = "AsinSale")
+@Entity
 public class AsinSale extends BaseEntity {
 
     @JsonIgnore
