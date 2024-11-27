@@ -1,4 +1,3 @@
-
 package com.brix.Seller_Sync.reportqueue;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,40 +12,46 @@ import lombok.extern.java.Log;
 @Log
 public class ReportQueueServiceImpl implements ReportQueueService {
     // TODO move this to redis or some other in-memory database
-    private final ConcurrentHashMap<String, String> reportQueue = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Object, Object> reportQueues = new ConcurrentHashMap<Object,Object>();
 
     @Override
-    public void enqueueReport(ReportQueue reportQueueObj, String value) {
-        String key = reportQueueObj.getReportKey();
-
-        log.info(key + " : " + value);
-        reportQueue.put(key, value);
+    public void enqueueReport(Object queueMeta, Object reportMeta) {
+        reportQueues.put(queueMeta, reportMeta);
     }
 
     @Override
-    public void dequeueReport(String key) {
-        reportQueue.remove(key);
+    public void dequeueReport(Object key) {
+        if (reportQueues.containsKey(key)){
+            reportQueues.remove(key);
+        }
     }
 
     @Override
-    public ConcurrentHashMap<String, String> getQueuedReports(ReportType reportType) {
-        ConcurrentHashMap<String, String> reports = new ConcurrentHashMap<>();
-        for (String key : reportQueue.keySet()) {
-            if (key.startsWith(reportType.toString())) {
-                reports.put(key, reportQueue.get(key));
+    public ConcurrentHashMap<Object, Object> getQueuedReports(ReportType reportType) {
+        ConcurrentHashMap<Object, Object> chunkReports = new ConcurrentHashMap<Object, Object>();
+        int chunkSize = 5;
+
+        if (reportQueues.isEmpty()) {
+            return chunkReports;
+        }
+
+        int count = 0;
+        for (Object queue : reportQueues.keySet()) {
+            if (count >= chunkSize) break;
+
+            ReportQueue reportQueueMeta = (ReportQueue) queue;
+            Object reportMeta = reportQueues.get(queue);
+
+            if (reportMeta != null && reportQueueMeta.getReportSpecification().getReportType().equals(reportType)) {
+                chunkReports.put(queue, reportMeta);
+                count++;
             }
         }
-        return reports;
+        return chunkReports;
     }
 
     @Override
-    public Boolean isReportInQueue(ReportQueue reportQueueObj) {
-        String key = reportQueueObj.getReportKey();
-        return reportQueue.containsKey(key);
-    }
-   
-    @Override
-    public String getClientIdFromKey(String key) {
-        return key.split(":")[1];
+    public Boolean isReportInQueue(ReportQueue reportQueueMeta) {
+        return reportQueues.containsKey(reportQueueMeta);
     }
 }

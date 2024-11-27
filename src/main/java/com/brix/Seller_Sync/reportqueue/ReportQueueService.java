@@ -6,14 +6,11 @@ import com.brix.Seller_Sync.amzn.payload.ReportSpecification.ReportType;
 
 public interface ReportQueueService {
 
-    void enqueueReport(ReportQueue reportQueueObj, String value);
+    void enqueueReport(Object queueMeta, Object reportMeta);
 
-    void dequeueReport(String key);
+    void dequeueReport(Object key);
 
-    ConcurrentHashMap<String, String> getQueuedReports(ReportType reportType);
+    ConcurrentHashMap<Object, Object> getQueuedReports(ReportType reportType);
 
     Boolean isReportInQueue(ReportQueue reportQueueObj);
-
-    String getClientIdFromKey(String key);
-
 }

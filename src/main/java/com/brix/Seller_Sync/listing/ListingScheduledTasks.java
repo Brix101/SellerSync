@@ -41,7 +41,7 @@ public class ListingScheduledTasks {
     private ReportQueueService reportQueueService;
 
 
-    // @Scheduled(cron = "*/30 * * * * ?") // Every 30 seconds
+    // @Scheduled(cron = "5 * * * * ?") // Every 30 seconds
     @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
     public void createListingReport() {
         // TODO move this to a service with a filter for all the store clients
@@ -62,8 +62,8 @@ public class ListingScheduledTasks {
 
                 if (!reportQueueService.isReportInQueue(reportQueue)){
                     ReportResponse reportResponse = amznSPReportService.createReport(client, reportSpecification);
-
-                    reportQueueService.enqueueReport(reportQueue, reportResponse.getReportId());
+                    
+                    reportQueueService.enqueueReport(reportQueue, reportResponse);
                 }
             } catch (Exception e) {
                 log.severe("Failed to create report for client: " + client.getClientId() + " due to: " + e.getMessage());
@@ -73,17 +73,15 @@ public class ListingScheduledTasks {
 
     @Scheduled(fixedDelay = 5000) // This cron expression means every 5 seconds
     public void getAllReports(){
-        ConcurrentHashMap<String, String> reportQueue = reportQueueService.getQueuedReports(ReportType.GET_MERCHANT_LISTINGS_ALL_DATA);
+        ConcurrentHashMap<Object, Object> reportQueues = reportQueueService.getQueuedReports(ReportType.GET_MERCHANT_LISTINGS_ALL_DATA);
 
-        if (!reportQueue.isEmpty()){
-            for (String key : reportQueue.keySet()){
+        if (!reportQueues.isEmpty()){
+            for (Object que : reportQueues.keySet()){
                 try {
+                    ReportQueue reportQueue = (ReportQueue) que;
 
-                    String clientId = reportQueueService.getClientIdFromKey(key);
-                    Client client = clientService.getClientByClientId(clientId);
-                    String reportId = reportQueue.get(key);
-
-                    ReportResponse reportResponse = new ReportResponse(reportId);
+                    Client client = reportQueue.getClient();
+                    ReportResponse reportResponse = (ReportResponse) reportQueues.get(que);
 
                     Report report = amznSPReportService.getReport(client, reportResponse);
 
@@ -96,12 +94,10 @@ public class ListingScheduledTasks {
                             createListingRequest.setStoreId(client.getStore().getId());
                             listingService.upsertListing(createListingRequest);
                         }
-                        
+                        reportQueueService.dequeueReport(que);
                     }
                 } catch (Exception e) {
-                    log.info("Failed to get report for key: " + key + " due to: " + e.getMessage());
-                } finally {
-                    reportQueueService.dequeueReport(key);
+                    log.info("Failed to get report for key: " + que + " due to: " + e.getMessage());
                 }
             }
         }

@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
@@ -90,20 +92,40 @@ public class SaleServiceImpl implements SaleService {
         List<AsinSale> asinSales = new ArrayList<>();
 
         if (sale != null) {
-            asinSales = sale.getAsinSales();
+            // Replace old data with new data
+            sale.setUnitsOrdered(salesByDate.getUnitsOrdered());
+            sale.setTotalOrderItems(salesByDate.getTotalOrderItems());
+            sale.setUnitsRefunded(salesByDate.getUnitsRefunded());
+            sale.setRefundRate(salesByDate.getRefundRate());
+            sale.setUnitsShipped(salesByDate.getUnitsShipped());
+            sale.setOrdersShipped(salesByDate.getOrdersShipped());
+            sale.setOrderedProductSalesAmount(orderedProductSales.getAmount());
+            sale.setAverageSalesPerOrderItem(averageSalesPerOrderItem.getAmount());
+            sale.setShippedProductSales(shippedProductSales.getAmount());
 
-            sale.setUnitsOrdered(sale.getUnitsOrdered() + salesByDate.getUnitsOrdered());
-            sale.setTotalOrderItems(sale.getTotalOrderItems() + salesByDate.getTotalOrderItems());
-            sale.setUnitsRefunded(sale.getUnitsRefunded() + salesByDate.getUnitsRefunded());
-            sale.setRefundRate(sale.getRefundRate() + salesByDate.getRefundRate());
-            sale.setUnitsShipped(sale.getUnitsShipped() + salesByDate.getUnitsShipped());
-            sale.setOrdersShipped(sale.getOrdersShipped() + salesByDate.getOrdersShipped());
-            sale.setOrderedProductSalesAmount(sale.getOrderedProductSalesAmount() + orderedProductSales.getAmount());
-            sale.setAverageSalesPerOrderItem(sale.getAverageSalesPerOrderItem() + averageSalesPerOrderItem.getAmount());
-            sale.setShippedProductSales(sale.getShippedProductSales() + shippedProductSales.getAmount());
+            // Create a map of existing AsinSales for quick lookup
+            Map<String, AsinSale> existingAsinSalesMap = sale.getAsinSales().stream()
+                .collect(Collectors.toMap(AsinSale::getChildAsin, asinSale -> asinSale));
+            
+            for (SalesAndTrafficByAsin salesAndTrafficByAsin : salesAndTrafficReport.getSalesAndTrafficByAsin()) {
+                String childAsin = salesAndTrafficByAsin.getChildAsin();
+                AsinSale asinSale = existingAsinSalesMap.getOrDefault(childAsin, new AsinSale());
+                asinSale.setSale(sale);
 
+                SalesByAsin salesByAsin = salesAndTrafficByAsin.getSalesByAsin();
+                Money orderedProductSalesByAsin = salesByAsin.getOrderedProductSales();
 
-        }else {
+                asinSale.setParentAsin(salesAndTrafficByAsin.getParentAsin());
+                asinSale.setChildAsin(childAsin);
+                asinSale.setSku(salesAndTrafficByAsin.getSku());
+                asinSale.setUnitsOrdered(salesByAsin.getUnitsOrdered());
+                asinSale.setOrderedProductSalesAmount(orderedProductSalesByAsin.getAmount());
+                asinSale.setCurrencyCode(orderedProductSalesByAsin.getCurrencyCode());
+                asinSale.setTotalOrderItems(salesByAsin.getTotalOrderItems());
+
+                asinSales.add(asinSale);
+            }
+        } else {
             sale = new Sale();
             sale.setClient(client);
             sale.setDate(LocalDate.parse(reportDate));
@@ -118,27 +140,24 @@ public class SaleServiceImpl implements SaleService {
             sale.setOrderedProductSalesAmount(orderedProductSales.getAmount());
             sale.setAverageSalesPerOrderItem(averageSalesPerOrderItem.getAmount());
             sale.setShippedProductSales(salesByDate.getShippedProductSales().getAmount());
-        }
 
+            for (SalesAndTrafficByAsin salesAndTrafficByAsin : salesAndTrafficReport.getSalesAndTrafficByAsin()) {
+                AsinSale asinSale = new AsinSale();
+                asinSale.setSale(sale);
 
+                SalesByAsin salesByAsin = salesAndTrafficByAsin.getSalesByAsin();
+                Money orderedProductSalesByAsin = salesByAsin.getOrderedProductSales();
 
-        for (SalesAndTrafficByAsin salesAndTrafficByAsin : salesAndTrafficReport.getSalesAndTrafficByAsin()) {
+                asinSale.setParentAsin(salesAndTrafficByAsin.getParentAsin());
+                asinSale.setChildAsin(salesAndTrafficByAsin.getChildAsin());
+                asinSale.setSku(salesAndTrafficByAsin.getSku());
+                asinSale.setUnitsOrdered(salesByAsin.getUnitsOrdered());
+                asinSale.setOrderedProductSalesAmount(orderedProductSalesByAsin.getAmount());
+                asinSale.setCurrencyCode(orderedProductSalesByAsin.getCurrencyCode());
+                asinSale.setTotalOrderItems(salesByAsin.getTotalOrderItems());
 
-            AsinSale asinSale = new AsinSale();
-            asinSale.setSale(sale);
-
-            SalesByAsin salesByAsin = salesAndTrafficByAsin.getSalesByAsin();
-            Money orderedProductSalesByAsin = salesByAsin.getOrderedProductSales();
-
-            asinSale.setParentAsin(salesAndTrafficByAsin.getParentAsin());
-            asinSale.setChildAsin(salesAndTrafficByAsin.getChildAsin());
-            asinSale.setSku(salesAndTrafficByAsin.getSku());
-            asinSale.setUnitsOrdered(salesByAsin.getUnitsOrdered());
-            asinSale.setOrderedProductSalesAmount(orderedProductSalesByAsin.getAmount());
-            asinSale.setCurrencyCode(orderedProductSalesByAsin.getCurrencyCode());
-            asinSale.setTotalOrderItems(salesByAsin.getTotalOrderItems());
-
-            asinSales.add(asinSale);
+                asinSales.add(asinSale);
+            }
         }
 
         sale.setAsinSales(asinSales);
