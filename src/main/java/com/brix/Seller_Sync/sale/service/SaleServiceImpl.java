@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
@@ -101,8 +103,28 @@ public class SaleServiceImpl implements SaleService {
             sale.setAverageSalesPerOrderItem(averageSalesPerOrderItem.getAmount());
             sale.setShippedProductSales(shippedProductSales.getAmount());
 
-            // Clear existing AsinSales and add new ones
-            sale.getAsinSales().clear();
+            // Create a map of existing AsinSales for quick lookup
+            Map<String, AsinSale> existingAsinSalesMap = sale.getAsinSales().stream()
+                .collect(Collectors.toMap(AsinSale::getChildAsin, asinSale -> asinSale));
+            
+            for (SalesAndTrafficByAsin salesAndTrafficByAsin : salesAndTrafficReport.getSalesAndTrafficByAsin()) {
+                String childAsin = salesAndTrafficByAsin.getChildAsin();
+                AsinSale asinSale = existingAsinSalesMap.getOrDefault(childAsin, new AsinSale());
+                asinSale.setSale(sale);
+
+                SalesByAsin salesByAsin = salesAndTrafficByAsin.getSalesByAsin();
+                Money orderedProductSalesByAsin = salesByAsin.getOrderedProductSales();
+
+                asinSale.setParentAsin(salesAndTrafficByAsin.getParentAsin());
+                asinSale.setChildAsin(childAsin);
+                asinSale.setSku(salesAndTrafficByAsin.getSku());
+                asinSale.setUnitsOrdered(salesByAsin.getUnitsOrdered());
+                asinSale.setOrderedProductSalesAmount(orderedProductSalesByAsin.getAmount());
+                asinSale.setCurrencyCode(orderedProductSalesByAsin.getCurrencyCode());
+                asinSale.setTotalOrderItems(salesByAsin.getTotalOrderItems());
+
+                asinSales.add(asinSale);
+            }
         } else {
             sale = new Sale();
             sale.setClient(client);
@@ -118,25 +140,24 @@ public class SaleServiceImpl implements SaleService {
             sale.setOrderedProductSalesAmount(orderedProductSales.getAmount());
             sale.setAverageSalesPerOrderItem(averageSalesPerOrderItem.getAmount());
             sale.setShippedProductSales(salesByDate.getShippedProductSales().getAmount());
-        }
 
-        for (SalesAndTrafficByAsin salesAndTrafficByAsin : salesAndTrafficReport.getSalesAndTrafficByAsin()) {
+            for (SalesAndTrafficByAsin salesAndTrafficByAsin : salesAndTrafficReport.getSalesAndTrafficByAsin()) {
+                AsinSale asinSale = new AsinSale();
+                asinSale.setSale(sale);
 
-            AsinSale asinSale = new AsinSale();
-            asinSale.setSale(sale);
+                SalesByAsin salesByAsin = salesAndTrafficByAsin.getSalesByAsin();
+                Money orderedProductSalesByAsin = salesByAsin.getOrderedProductSales();
 
-            SalesByAsin salesByAsin = salesAndTrafficByAsin.getSalesByAsin();
-            Money orderedProductSalesByAsin = salesByAsin.getOrderedProductSales();
+                asinSale.setParentAsin(salesAndTrafficByAsin.getParentAsin());
+                asinSale.setChildAsin(salesAndTrafficByAsin.getChildAsin());
+                asinSale.setSku(salesAndTrafficByAsin.getSku());
+                asinSale.setUnitsOrdered(salesByAsin.getUnitsOrdered());
+                asinSale.setOrderedProductSalesAmount(orderedProductSalesByAsin.getAmount());
+                asinSale.setCurrencyCode(orderedProductSalesByAsin.getCurrencyCode());
+                asinSale.setTotalOrderItems(salesByAsin.getTotalOrderItems());
 
-            asinSale.setParentAsin(salesAndTrafficByAsin.getParentAsin());
-            asinSale.setChildAsin(salesAndTrafficByAsin.getChildAsin());
-            asinSale.setSku(salesAndTrafficByAsin.getSku());
-            asinSale.setUnitsOrdered(salesByAsin.getUnitsOrdered());
-            asinSale.setOrderedProductSalesAmount(orderedProductSalesByAsin.getAmount());
-            asinSale.setCurrencyCode(orderedProductSalesByAsin.getCurrencyCode());
-            asinSale.setTotalOrderItems(salesByAsin.getTotalOrderItems());
-
-            asinSales.add(asinSale);
+                asinSales.add(asinSale);
+            }
         }
 
         sale.setAsinSales(asinSales);
