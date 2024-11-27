@@ -37,11 +37,8 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
         String existingReportId = redisTemplate.opsForValue().get(reportKey);
         if (existingReportId != null) {
-            log.info(reportSpecification.getReportType() + " Report already exists for client " + client.getClientId());
             return new ReportResponse(existingReportId);
         }
-
-        log.info("Creating " + reportSpecification.getReportType() + " report for client " + client.getClientId());
 
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports";
         RestTemplate restTemplate = new RestTemplate();
@@ -63,7 +60,6 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
         ReportResponse reportResponse = response.getBody();
 
-        log.info("Created " + reportSpecification.getReportType() + " report for client " + client.getClientId());
         if (reportResponse != null) {
             redisTemplate.opsForValue().set(reportKey, reportResponse.getReportId(), 3600, TimeUnit.SECONDS);
         }
@@ -73,8 +69,6 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
     @Override
     public Report getReport(Client client, ReportResponse reportResponse) {
-        log.info("Getting report for reportId: " + reportResponse.getReportId());
-
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/reports/" + reportResponse.getReportId();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -94,15 +88,12 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
         Report report = response.getBody();
 
-        log.info("Status for reportId: " + report.getReportId() + " is " + report.getProcessingStatus());
         return report;
     }
 
 
     @Override
     public ReportDocument getReportDocument(Client client, Report report) {
-        log.info("Getting report document for reportId: " + report.getReportId());
-
         String url = AppConstants.SP_API_URL + "/reports/2021-06-30/documents/" + report.getReportDocumentId();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -122,7 +113,6 @@ public class AmznSPReportServiceImpl implements AmznSPReportService {
 
         ReportDocument reportDocument = response.getBody();
         
-        log.info("Report document received for reportId: " + report.getReportId());
         return reportDocument;
     }
 }

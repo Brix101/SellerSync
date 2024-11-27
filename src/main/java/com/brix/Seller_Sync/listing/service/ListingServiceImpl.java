@@ -28,7 +28,7 @@ public class ListingServiceImpl implements ListingService {
 
     @Override
     public Listing upsertListing(CreateListingRequest createListingRequest) {
-        return listingRepository.upsertByAsin(createListingRequest.getSellerSku(), createListingRequest.getAsin(), createListingRequest.getStatus(), createListingRequest.getStoreId());
+        return listingRepository.upsertByAsin(createListingRequest);
     }
 
     @Override
@@ -52,7 +52,13 @@ public class ListingServiceImpl implements ListingService {
                         String status = columns[28];
 
                         if (!asin.isEmpty()) {
-                            createListingRequests.add(new CreateListingRequest(sellerSku, asin, status, 0L));
+                            CreateListingRequest createListingRequest = CreateListingRequest.builder()
+                                    .sellerSku(sellerSku)
+                                    .asin(asin)
+                                    .status(status)
+                                    .build();
+
+                            createListingRequests.add(createListingRequest);
                         }
                     }
                 }

@@ -1,6 +1,7 @@
 package com.brix.Seller_Sync.listing;
 
 import com.brix.Seller_Sync.brand.Brand;
+import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.common.entity.BaseEntity;
 import com.brix.Seller_Sync.store.Store;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,12 +32,17 @@ public class Listing extends BaseEntity {
     private String asin;
 
     @Column()
-    private String status ;
+    private String status;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private Client client;
 
     @JsonIgnore
     @ManyToOne
