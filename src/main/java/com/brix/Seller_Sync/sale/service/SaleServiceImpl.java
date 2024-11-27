@@ -90,20 +90,20 @@ public class SaleServiceImpl implements SaleService {
         List<AsinSale> asinSales = new ArrayList<>();
 
         if (sale != null) {
-            asinSales = sale.getAsinSales();
+            // Replace old data with new data
+            sale.setUnitsOrdered(salesByDate.getUnitsOrdered());
+            sale.setTotalOrderItems(salesByDate.getTotalOrderItems());
+            sale.setUnitsRefunded(salesByDate.getUnitsRefunded());
+            sale.setRefundRate(salesByDate.getRefundRate());
+            sale.setUnitsShipped(salesByDate.getUnitsShipped());
+            sale.setOrdersShipped(salesByDate.getOrdersShipped());
+            sale.setOrderedProductSalesAmount(orderedProductSales.getAmount());
+            sale.setAverageSalesPerOrderItem(averageSalesPerOrderItem.getAmount());
+            sale.setShippedProductSales(shippedProductSales.getAmount());
 
-            sale.setUnitsOrdered(sale.getUnitsOrdered() + salesByDate.getUnitsOrdered());
-            sale.setTotalOrderItems(sale.getTotalOrderItems() + salesByDate.getTotalOrderItems());
-            sale.setUnitsRefunded(sale.getUnitsRefunded() + salesByDate.getUnitsRefunded());
-            sale.setRefundRate(sale.getRefundRate() + salesByDate.getRefundRate());
-            sale.setUnitsShipped(sale.getUnitsShipped() + salesByDate.getUnitsShipped());
-            sale.setOrdersShipped(sale.getOrdersShipped() + salesByDate.getOrdersShipped());
-            sale.setOrderedProductSalesAmount(sale.getOrderedProductSalesAmount() + orderedProductSales.getAmount());
-            sale.setAverageSalesPerOrderItem(sale.getAverageSalesPerOrderItem() + averageSalesPerOrderItem.getAmount());
-            sale.setShippedProductSales(sale.getShippedProductSales() + shippedProductSales.getAmount());
-
-
-        }else {
+            // Clear existing AsinSales and add new ones
+            sale.getAsinSales().clear();
+        } else {
             sale = new Sale();
             sale.setClient(client);
             sale.setDate(LocalDate.parse(reportDate));
@@ -119,8 +119,6 @@ public class SaleServiceImpl implements SaleService {
             sale.setAverageSalesPerOrderItem(averageSalesPerOrderItem.getAmount());
             sale.setShippedProductSales(salesByDate.getShippedProductSales().getAmount());
         }
-
-
 
         for (SalesAndTrafficByAsin salesAndTrafficByAsin : salesAndTrafficReport.getSalesAndTrafficByAsin()) {
 
