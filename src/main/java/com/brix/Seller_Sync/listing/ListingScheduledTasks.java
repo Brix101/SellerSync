@@ -41,7 +41,7 @@ public class ListingScheduledTasks {
     private ReportQueueService reportQueueService;
 
 
-    // @Scheduled(cron = "5 * * * * ?") // Every 30 seconds
+    // @Scheduled(cron = "5 * * * * ?") // Every 5 minutes
     @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
     public void createListingReport() {
         // TODO move this to a service with a filter for all the store clients
@@ -92,6 +92,7 @@ public class ListingScheduledTasks {
                         log.info("Update listings for client: " + client.getClientId());
                         for (CreateListingRequest createListingRequest : createListingRequests){
                             createListingRequest.setStoreId(client.getStore().getId());
+                            createListingRequest.setClientId(client.getId());
                             listingService.upsertListing(createListingRequest);
                         }
                         reportQueueService.dequeueReport(que);
