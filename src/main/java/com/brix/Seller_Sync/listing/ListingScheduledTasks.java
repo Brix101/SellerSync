@@ -98,7 +98,7 @@ public class ListingScheduledTasks {
                         reportQueueService.dequeueReport(que);
                     }
                 } catch (Exception e) {
-                    log.info("Failed to get report for key: " + que + " due to: " + e.getMessage());
+                    log.severe("Failed to get report for key: " + que + " due to: " + e.getMessage());
                 }
             }
         }
