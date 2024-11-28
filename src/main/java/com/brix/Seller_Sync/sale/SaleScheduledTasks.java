@@ -44,8 +44,8 @@ public class SaleScheduledTasks {
     private SaleService saleService;
 
 
-    // @Scheduled(cron = "5 * * * * ?") // Every 5 minutes
-    @Scheduled(cron = "0 0 0 * * ?")  // Every day at midnight
+    @Scheduled(cron = "5 * * * * ?") // Every 5 minutes
+    // @Scheduled(cron = "0 0 0 * * ?")  // Every day at midnight
     private void createSaleAndTrafficReport() {
         log.info("Starting sale and traffic report cron job");
 
