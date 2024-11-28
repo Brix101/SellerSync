@@ -115,7 +115,7 @@ public class SaleScheduledTasks {
                         reportQueueService.dequeueReport(que); // Dequeue only on success
                     }
                 } catch (Exception e) {
-                    log.info("Failed to get report for key: " + que + " due to: " + e.getMessage());
+                    log.severe("Failed to get report for key: " + que + " due to: " + e.getMessage());
                 }
             }
         }
