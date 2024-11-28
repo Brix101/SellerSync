@@ -41,8 +41,8 @@ public class ListingScheduledTasks {
     private ReportQueueService reportQueueService;
 
 
-    @Scheduled(cron = "5 * * * * ?") // Every 5 minutes
-    // @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
+    // @Scheduled(cron = "5 * * * * ?") // Every 5 minutes
+    @Scheduled(cron = "0 0 0 * * ?") // This cron expression means every day at midnight
     public void createListingReport() {
         // TODO move this to a service with a filter for all the store clients
         List<Client> clients = clientService.getAllSPClientsToken();
