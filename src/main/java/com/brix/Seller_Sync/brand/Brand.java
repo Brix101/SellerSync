@@ -40,4 +40,8 @@ public class Brand extends BaseEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Listing> listings = new ArrayList<>();
+
+    public String normalizeName() {
+        return name.toLowerCase().trim();
+    }
 }

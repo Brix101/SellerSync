@@ -43,7 +43,7 @@ public class MarketplaceScheduledTasks {
 
                 List<String> storeMarketplaceIds = storeMarketplaces.stream().map(Marketplace::getMarketplaceId).collect(Collectors.toList());
                 
-                log.info("Marketplaces for client: " + client.getClientId() + " are: " + marketplaces.size());
+                log.info("Updating marketplaces for client: " + client.getId() + " with " + marketplaces.size() + " marketplaces");
                 for (AmznMarketplace amznMarketplace : marketplaces){
                     if (!storeMarketplaceIds.contains(amznMarketplace.getId())){
                         Marketplace marketplace = amznMarketplace.toMarketplace();
@@ -57,7 +57,5 @@ public class MarketplaceScheduledTasks {
                 log.severe("Failed to update marketplaces for client: " + client.getId() + " due to: " + e.getMessage());
             }
         }
-
-        log.info("Marketplace update cron job completed");
     }
 }

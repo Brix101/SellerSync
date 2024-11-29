@@ -47,8 +47,6 @@ public class SaleScheduledTasks {
     // @Scheduled(cron = "5 * * * * ?") // Every 5 minutes
     @Scheduled(cron = "0 0 0 * * ?")  // Every day at midnight
     private void createSaleAndTrafficReport() {
-        log.info("Starting sale and traffic report cron job");
-
         // TODO move this to a service with a filter for all the store clients
         List<Client> clients = clientService.getAllSPClientsToken();
 
@@ -111,7 +109,7 @@ public class SaleScheduledTasks {
 
                         Sale sale = saleService.saveSalesReport(client, salesAndTrafficReport);
 
-                        log.info("Total items saved: " + sale.getAsinSales().size());
+                        log.info("Saved sales report for client: " + client.getClientId() + " with id: " + sale.getId());
                         reportQueueService.dequeueReport(que); // Dequeue only on success
                     }
                 } catch (Exception e) {
