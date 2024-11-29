@@ -89,7 +89,7 @@ public class ListingScheduledTasks {
                         ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
                         List<CreateListingRequest> createListingRequests = listingService.parseReportDocument(reportDocument);
 
-                        log.info("Update listings for client: " + client.getClientId());
+                        log.info("Updating listings for client: " + client.getClientId() + " with " + createListingRequests.size() + " listings");
                         for (CreateListingRequest createListingRequest : createListingRequests){
                             createListingRequest.setStoreId(client.getStore().getId());
                             createListingRequest.setClientId(client.getId());
