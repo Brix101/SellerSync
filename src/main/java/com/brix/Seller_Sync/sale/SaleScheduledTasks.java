@@ -22,7 +22,6 @@ import com.brix.Seller_Sync.client.Client;
 import com.brix.Seller_Sync.client.service.ClientService;
 import com.brix.Seller_Sync.marketplace.Marketplace;
 import com.brix.Seller_Sync.reportqueue.ReportQueue;
-import com.brix.Seller_Sync.reportqueue.ReportQueueService;
 import com.brix.Seller_Sync.sale.service.SaleService;
 
 import lombok.extern.java.Log;
@@ -38,14 +37,13 @@ public class SaleScheduledTasks {
     private AmznSPReportService amznSPReportService;
 
     @Autowired
-    private ReportQueueService reportQueueService;
-
-    @Autowired
     private SaleService saleService;
 
+    private final ConcurrentHashMap<Object, Object> reportQueues = new ConcurrentHashMap<>();
 
-    // @Scheduled(cron = "5 * * * * ?") // Every 5 minutes
-    @Scheduled(cron = "0 0 0 * * ?")  // Every day at midnight
+
+    @Scheduled(cron = "5 * * * * ?") // Every 5 minutes
+    // @Scheduled(cron = "0 0 0 * * ?")  // Every day at midnight
     private void createSaleAndTrafficReport() {
         // TODO move this to a service with a filter for all the store clients
         List<Client> clients = clientService.getAllSPClientsToken();
@@ -76,14 +74,14 @@ public class SaleScheduledTasks {
                     ReportQueue reportQueue = new ReportQueue(client, reportSpecification);
 
 
-                    if (!reportQueueService.isReportInQueue(reportQueue)){
+                    if (!reportQueues.containsKey(reportQueue)){
                         ReportResponse reportResponse = amznSPReportService.createReport(client, reportSpecification);
 
-                        reportQueueService.enqueueReport(reportQueue, reportResponse);
+                        reportQueues.put(reportQueue, reportResponse);
                     }
                 }
             } catch (Exception e) {
-                log.severe("Failed to create sale and traffic report for client: " + client.getId() + " due to: " + e.getMessage());
+                log.severe("Failed to "+ ReportType.GET_SALES_AND_TRAFFIC_REPORT +" for client: " + client.getId() + " due to: " + e.getMessage());
             }
         }
     }
@@ -91,18 +89,19 @@ public class SaleScheduledTasks {
 
     @Scheduled(fixedDelay = 5000) // This cron expression means every 5 seconds
     public void getAllReports(){
-        ConcurrentHashMap<Object, Object> reportQueues = reportQueueService.getQueuedReports(ReportType.GET_SALES_AND_TRAFFIC_REPORT);
-
         if (!reportQueues.isEmpty()){
-            for (Object que : reportQueues.keySet()){
+            for (Object queue : reportQueues.keySet()){
                 try {
-                    ReportQueue reportQueue = (ReportQueue) que;
+                    ReportQueue reportQueue = (ReportQueue) queue;
 
                     Client client = reportQueue.getClient();
-                    ReportResponse reportResponse = (ReportResponse) reportQueues.get(que);
-
+                    ReportResponse reportResponse = (ReportResponse) reportQueues.get(queue);
+                    if (reportResponse == null){
+                        continue;
+                    }
+                    
                     Report report = amznSPReportService.getReport(client, reportResponse);
-
+                    
                     if (report.getReportDocumentId() != null){
                         ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
                         SalesAndTrafficReport salesAndTrafficReport = saleService.parseReportDocument(reportDocument);
@@ -110,10 +109,10 @@ public class SaleScheduledTasks {
                         Sale sale = saleService.saveSalesReport(client, salesAndTrafficReport);
 
                         log.info("Saved sales report for client: " + client.getClientId() + " with id: " + sale.getId());
-                        reportQueueService.dequeueReport(que); // Dequeue only on success
+                        reportQueues.remove(queue); // Dequeue only on success
                     }
                 } catch (Exception e) {
-                    log.severe("Failed to get report for key: " + que + " due to: " + e.getMessage());
+                    log.severe("Failed to get report for key: " + queue + " due to: " + e.getMessage());
                 }
             }
         }
