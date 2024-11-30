@@ -91,14 +91,16 @@ public class SaleScheduledTasks {
     public void getAllReports(){
         if (!reportQueues.isEmpty()){
             for (Object queue : reportQueues.keySet()){
+                Object queueValue = reportQueues.get(queue);
+                if (queueValue == null){
+                    continue;
+                }
+
                 try {
                     ReportQueue reportQueue = (ReportQueue) queue;
 
                     Client client = reportQueue.getClient();
-                    ReportResponse reportResponse = (ReportResponse) reportQueues.get(queue);
-                    if (reportResponse == null){
-                        continue;
-                    }
+                    ReportResponse reportResponse = (ReportResponse) queueValue;
                     
                     Report report = amznSPReportService.getReport(client, reportResponse);
                     
