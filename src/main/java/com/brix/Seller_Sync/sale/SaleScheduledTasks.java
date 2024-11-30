@@ -93,29 +93,27 @@ public class SaleScheduledTasks {
             log.info(reportQueues.toString());
             for (Object queue : reportQueues.keySet()){
                 Object queueValue = reportQueues.get(queue);
-                if (queueValue == null){
-                    continue;
-                }
+                if (queueValue != null){
+                    try {
+                        ReportQueue reportQueue = (ReportQueue) queue;
 
-                try {
-                    ReportQueue reportQueue = (ReportQueue) queue;
+                        Client client = reportQueue.getClient();
+                        ReportResponse reportResponse = (ReportResponse) queueValue;
+                        
+                        Report report = amznSPReportService.getReport(client, reportResponse);
+                        
+                        if (report.getReportDocumentId() != null){
+                            ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
+                            SalesAndTrafficReport salesAndTrafficReport = saleService.parseReportDocument(reportDocument);
 
-                    Client client = reportQueue.getClient();
-                    ReportResponse reportResponse = (ReportResponse) queueValue;
-                    
-                    Report report = amznSPReportService.getReport(client, reportResponse);
-                    
-                    if (report.getReportDocumentId() != null){
-                        ReportDocument reportDocument = amznSPReportService.getReportDocument(client, report);
-                        SalesAndTrafficReport salesAndTrafficReport = saleService.parseReportDocument(reportDocument);
+                            Sale sale = saleService.saveSalesReport(client, salesAndTrafficReport);
 
-                        Sale sale = saleService.saveSalesReport(client, salesAndTrafficReport);
-
-                        log.info("Saved sales report for client: " + client.getClientId() + " with id: " + sale.getId());
-                        reportQueues.remove(queue); // Dequeue only on success
+                            log.info("Saved sales report for client: " + client.getClientId() + " with id: " + sale.getId());
+                            reportQueues.remove(queue); // Dequeue only on success
+                        }
+                    } catch (Exception e) {
+                        log.severe("Failed to get report for key: " + queue + " due to: " + e.getMessage());
                     }
-                } catch (Exception e) {
-                    log.severe("Failed to get report for key: " + queue + " due to: " + e.getMessage());
                 }
             }
         }
