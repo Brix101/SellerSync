@@ -90,6 +90,7 @@ public class SaleScheduledTasks {
     @Scheduled(fixedDelay = 5000) // This cron expression means every 5 seconds
     public void getAllReports(){
         if (!reportQueues.isEmpty()){
+            log.info(reportQueues.toString());
             for (Object queue : reportQueues.keySet()){
                 Object queueValue = reportQueues.get(queue);
                 if (queueValue == null){
